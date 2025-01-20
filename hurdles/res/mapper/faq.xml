@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="faq">
+
+	<select id="getBoardNo" resultType="int">
+		SELECT BOARD_SEQ.NEXTVAL FROM DUAL 
+	</select>
+	 
+<!-- 	<select id="selectListTotalCount" resultType="int" parameterType="pagenation"> -->
+<!-- 		SELECT COUNT(*) -->
+<!-- 		FROM BOARD   -->
+<!-- 		WHERE DELYN = 'N'  -->
+<!-- 		AND  BOARD_CODE_NO = 2 -->
+<!-- 		<if test="searchVo.title != null and searchVo.title !=  -->
+<!-- 		''"> -->
+<!-- 			AND TITLE LIKE '%'||#{searchVo.board_title}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="searchVo.memName != null and searchVo.memName != ''"> -->
+<!-- 			AND M.MEM_NAME LIKE '%'||#{searchVo.memName}||'%' -->
+<!-- 		</if> -->
+<!-- 	</select> -->
+
+
+	<select id="getAllCount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CODE_NO = #{searchVo.boardCodeNo}
+		<where>
+			<if test="searchVo.boardTitle != null and searchVo.boardTitle != ''">
+				AND BOARD_TITLE LIKE '%'||#{searchVo.boardTitle}||'%'
+			</if>
+		</where>
+	</select>
+
+
+
+	<select id="list" resultType="boardVo" parameterType="pagenation">
+		SELECT B.* ,M.*
+		FROM BOARD B
+		LEFT JOIN MEMBER_PROFILE M ON (M.MEMBER_NO = B.MEMBER_NO)
+		WHERE DELYN = 'N' 
+		AND  BOARD_CODE_NO=#{searchVo.boardCodeNo}
+		ORDER BY CREATE_DATE DESC
+	</select>
+
+
+	<select id="detail" resultType="boardVo" parameterType="int">
+		SELECT B.* ,M.*
+		FROM BOARD B
+		LEFT JOIN MEMBER_PROFILE M ON (M.MEMBER_NO = B.MEMBER_NO)
+		WHERE BOARD_NO = #{boardNo}
+		AND  DELYN = 'N' 
+	</select>	
+	
+	<insert id="insert"  parameterType="boardVo">
+		INSERT INTO BOARD (BOARD_NO,BOARD_TITLE,BOARD_CONTENT,CREATE_DATE,UPDATE_DATE,BOARD_CODE_NO,MEMBER_NO,DELYN)
+		VALUES (BOARD_SEQ.NEXTVAL, #{boardTitle},#{boardContent},SYSDATE,SYSDATE,2,7,'N')
+	</insert>
+	
+	<update id="update" parameterType="boardVo">
+		UPDATE BOARD SET 
+		BOARD_TITLE = #{boardTitle},
+		BOARD_CONTENT = #{boardContent}
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<update id="delete" parameterType="boardVo">
+		UPDATE BOARD SET
+		DELYN = 'Y' 
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+
+	
+
+</mapper>

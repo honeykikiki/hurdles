@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="review">
+<insert id="insert" parameterType="reviewVo">
+	INSERT INTO REVIEW (REVIEW_NO,RESTAURANT_NO,MEMBER_NO,
+						REVIEW_CONTENT,REVIEW_SCORE,CREATE_DATE,
+						ORDERS_NO)
+    VALUES (#{reviewNo},#{restaurantNo},#{memberNo},
+    	   #{reviewContent},#{reviewScore},SYSDATE,#{ordersNo})
+
+</insert>
+
+	<select id="getReviewNo" resultType="int">
+		SELECT REVIEW_SEQ.NEXTVAL FROM DUAL
+	
+	</select>
+
+
+	<select id="reviewDetail" resultType="reviewVo" parameterType="reviewVo">
+		     SELECT 
+		    P.CREATE_DATE, O.ORDERS_NO, O.ORDERS_ADD1, O.ORDERS_ADD2, P.PAY_PRICE, P.PAY_MINUS, P.PAY_COUPON,
+		    P.PAY_NO, P.PAY_TOTAL_PRICE,
+	        DBMS_LOB.SUBSTR(REV.REVIEW_CONTENT, 4000, 1) AS REVIEW_CONTENT, REV.REVIEW_SCORE, REV.REVIEW_NO,
+	        MIN(R.RESTAURANT_NO) AS RESTAURANT_NO,
+		    MIN(R.RESTAURANT_NAME) AS RESTAURANT_NAME,
+	        CASE 
+	            WHEN COUNT(PROD.PRODUCT_NO) - 1 = 0 THEN MIN(PROD.PRODUCT_NAME)
+	            ELSE MIN(PROD.PRODUCT_NAME) || ' 외 ' || (COUNT(PROD.PRODUCT_NO) - 1) || '개'
+	        END AS PRODUCT_NAME,
+        	SUM(OP.ORDERS_PRODUCT_QTY) AS ORDERS_PRODUCT_QTY	        
+			FROM PAY P
+			LEFT JOIN ORDERS O ON O.ORDERS_NO = P.ORDERS_NO
+			LEFT JOIN ORDERS_PRODUCT OP ON OP.ORDERS_NO = O.ORDERS_NO
+			LEFT JOIN PRODUCT PROD ON PROD.PRODUCT_NO = OP.PRODUCT_NO
+			LEFT JOIN RESTAURANT R ON R.RESTAURANT_NO = PROD.RESTAURANT_NO
+	        LEFT JOIN REVIEW REV ON REV.RESTAURANT_NO = R.RESTAURANT_NO
+			WHERE O.MEMBER_NO = #{memberNo}
+	        AND O.ORDERS_NO = #{ordersNo}
+	        AND REV.REVIEW_NO = #{reviewNo}
+			GROUP BY P.CREATE_DATE, O.ORDERS_NO,O.ORDERS_ADD1, O.ORDERS_ADD2,P.PAY_PRICE,P.PAY_MINUS, P.PAY_COUPON,
+			    P.PAY_NO,P.PAY_PRICE, P.PAY_TOTAL_PRICE, DBMS_LOB.SUBSTR(REV.REVIEW_CONTENT, 4000, 1), REV.REVIEW_SCORE, REV.REVIEW_NO
+	</select>
+	
+
+	
+	<update id="reviewDelete" parameterType="reviewVo">
+		
+		UPDATE REVIEW SET
+    		DELYN = 'Y'
+		WHERE REVIEW_NO = #{reviewNo}
+	
+	</update>
+	
+	<select id="blackReviewList" resultType="reviewVo" parameterType="pagenation">
+		SELECT R.* ,M.*,Res.*
+		FROM Review R
+		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = R.MEMBER_NO)
+        LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO)
+		WHERE R.DELYN = 'Y' 
+		ORDER BY R.REVIEW_NO DESC
+<!-- 		<if test="searchVo.reviewContent != null and searchVo.reviewContent != ''"> -->
+<!-- 			AND reviewContent LIKE '%'||#{searchVo.reviewContent}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="searchVo.memName != null and searchVo.memName != ''"> -->
+<!-- 			AND M.MEMBER_NAME LIKE '%'||#{searchVo.memberName}||'%' -->
+<!-- 		</if> -->
+<!-- 		ORDER BY B.REG_DATE DESC -->
+<!-- 	    OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY -->
+	</select>
+	
+<!-- 	<select id="blackReviewList" resultType="reviewVo" parameterType="pagenation"> -->
+<!-- 	SELECT R.* ,M.*,Res.* -->
+<!-- 		FROM Review R -->
+<!-- 		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = R.MEMBER_NO) -->
+<!--         LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO) -->
+<!-- 		WHERE R.DELYN = 'Y'  -->
+<!-- 		AND REVIEW_NO = #{reviewNo} -->
+<!-- 		ORDER BY R.REVIEW_NO DESC -->
+	
+<!-- 	</select> -->
+	<select id="reviewReportDetail" resultType="reviewVo" parameterType="pagenation">
+	SELECT RR.REVIEW_REPORT_NO 		AS REVIEW_REPORT_NO,
+               RR.MEMBER_NO         AS MEMBER_NO,
+               M.MEMBER_NAME        AS MEMBER_NAME,
+               RR.REVIEW_REPORT_DES AS REVIEW_REPORT_DES,
+               R.REVIEW_CONTENT	    AS REVIEW_CONTENT,
+               RR.CREATE_DATE 	    AS CREATE_DATE, 
+               R. REVIEW_SCORE	    AS REVIEW_SCORE,
+               RES.RESTAURANT_NAME  AS RESTAURANT_NAME,
+               RR.TARGET_MEMBER_NO  AS TARGET_MEMBER_NO,
+               MP.MEMBER_NAME	    AS TARGET_MEMBER_NAME
+		FROM Review_REPORT RR
+		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = RR.MEMBER_NO)
+        LEFT join REVIEW R ON (RR.REVIEW_NO = R.REVIEW_NO)
+        LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO)
+        LEFT JOIN MEMBER_PROFILE MP ON (MP.MEMBER_NO = RR.TARGET_MEMBER_NO)
+		WHERE R.DELYN = 'N'
+		AND  RR.REVIEW_REPORT_NO = #{REVIEW_REPORT_NO} 	
+	
+	</select>
+	
+	
+	<select id="ReviewReportList" resultType="reviewVo" parameterType="pagenation">
+	SELECT RR.REVIEW_REPORT_NO 		AS REVIEW_REPORT_NO,
+               RR.MEMBER_NO         AS MEMBER_NO,
+               M.MEMBER_NAME        AS MEMBER_NAME,
+               RR.REVIEW_REPORT_DES AS REVIEW_REPORT_DES,
+               R.REVIEW_CONTENT	    AS REVIEW_CONTENT,
+               RR.CREATE_DATE 	    AS CREATE_DATE, 
+               R. REVIEW_SCORE	    AS REVIEW_SCORE,
+               RES.RESTAURANT_NAME  AS RESTAURANT_NAME,
+               RR.TARGET_MEMBER_NO  AS TARGET_MEMBER_NO,
+               MP.MEMBER_NAME	    AS TARGET_MEMBER_NAME
+		FROM Review_REPORT RR
+		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = RR.MEMBER_NO)
+        LEFT join REVIEW R ON (RR.REVIEW_NO = R.REVIEW_NO)
+        LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO)
+        LEFT JOIN MEMBER_PROFILE MP ON (MP.MEMBER_NO = RR.TARGET_MEMBER_NO)
+		WHERE R.DELYN = 'N' 
+	
+	</select>
+	
+	<select id="getAllCount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM REVIEW_REPORT
+		WHERE REVIEW_REPORT_NO = #{searchVo.reviewReportNo}
+		<where>
+			<if test="searchVo.reviewReportNo != null and searchVo.reviewReportNo != ''">
+				AND REVIEW_REPORT_NO '%'||#{searchVo.reviewReportNo}||'%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="reviewList" resultType="reviewVo" parameterType="reviewVo">
+		
+		SELECT  RES.RESTAURANT_NAME, RES.RESTAURANT_ADD1, RES.RESTAURANT_ADD2, RES.RESTAURANT_TEL,
+		R.REVIEW_CONTENT, R.REVIEW_SCORE,R.CREATE_DATE,A.ATTRIBUTE_NAME,R.REVIEW_NO,R.RESTAURANT_NO,
+        R.ORDERS_NO
+		FROM REVIEW R
+			LEFT JOIN RESTAURANT RES ON (R.RESTAURANT_NO = RES.RESTAURANT_NO)
+			LEFT JOIN REVIEW_ATTRIBUTE ATT ON (R.REVIEW_NO = ATT.REVIEW_NO)
+			LEFT JOIN ATTRIBUTE A ON (ATT.ATTRIBUTE_NO = A.ATTRIBUTE_NO)
+		WHERE R.DELYN='N'
+		AND R.MEMBER_NO = #{memberNo}
+
+	
+	</select>
+	
+	<select id="getName" resultType="reviewVo" parameterType="reviewVo">
+	
+		SELECT MEMBER_NAME
+			FROM MEMBER_PROFILE
+			WHERE MEMBER_NO = #{memberNo}
+
+	</select>
+	
+	<select id="getScore" resultType="reviewVo" parameterType="reviewVo">
+		
+			SELECT REVIEW_SCORE
+			FROM REVIEW
+			WHERE MEMBER_NO = #{memberNo}
+		
+	</select>
+	
+	<select id="getFileList" parameterType="reviewVo" resultType="reviewVo">
+           
+		SELECT F.*
+		FROM FILES F
+		LEFT JOIN REVIEW_FILE R ON (F.FILE_NO = R.FILE_NO)
+		WHERE R.REVIEW_NO = #{reviewNo}
+	</select>
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="question">
+	<!-- 문의글 등록 -->
+	<insert id="insert" parameterType="questionVo">
+		INSERT INTO QUESTION(QUESTION_NO,QUESTION_TITLE,QUESTION_CONTENT,CREATE_DATE,
+		                     MEMBER_NO,RESTAURANT_NO,FILE_NO)
+		VALUES(QUESTION_SEQ.NEXTVAL,#{questionTitle},#{questionContent},SYSDATE,
+		       #{memberNo},#{restaurantNo},#{fileNo})
+	</insert>
+<!-- 	questionNo가져오기  -->
+	<select id="getQuestionNo" resultType="int">
+		SELECT NVL(MAX(QUESTION_NO),0) FROM QUESTION
+	
+	</select>
+	
+<!-- 	상세보기 -->
+	<select id="detail" parameterType="questionVo" resultType="questionVo">
+<!-- 	파일 경로 절대경로 수정 뒤 쿼리에추가해야 -->
+		SELECT Q.QUESTION_TITLE,Q.QUESTION_CONTENT,Q.CREATE_DATE,Q.UPDATE_DATE,Q.QUESTION_ANSWER,
+               M.MEMBER_ID,M.MEMBER_ROLE
+          FROM QUESTION Q, MEMBER M  
+         WHERE (Q.MEMBER_NO = M.MEMBER_NO)
+           AND QUESTION_NO = #{questionNo}
+	
+	</select>
+<!-- 	리스트-->
+	<select id="list" resultType="questionVo" parameterType="memberVo" >
+		SELECT ROWNUM AS RM, QUESTION_NO, QUESTION_TITLE, MEMBER_NO
+	    FROM QUESTION
+	   WHERE MEMBER_NO = #{memberNo}
+			
+	</select>
+<!-- 	답글 -->
+	<update id="update" parameterType="questionVo">
+		UPDATE QUESTION
+		   SET UPDATE_DATE = SYSDATE,
+		       QUESTION_ANSWER = #{questionAnswer}
+		 WHERE QUESTION_NO = #{questionNo}
+	
+	
+	</update>
+	
+
+<!-- 	사장님화면 문의 리스트 -->
+	<select id="ownList" parameterType="QuestionVo" resultType="QuestionVo" >
+		
+		SELECT Q.* , M.* , R.*
+		FROM QUESTION Q
+		LEFT JOIN MEMBER_PROFILE M ON(Q.MEMBER_NO = M.MEMBER_NO)
+		LEFT JOIN RESTAURANT R ON (Q.RESTAURANT_NO = R.RESTAURANT_NO)
+ 		WHERE Q.RESTAURANT_NO IN (SELECT RESTAURANT_NO FROM RESTAURANT WHERE MEMBER_NO = #{searchVo.memberNo})
+		
+	
+	</select>
+	
+	<select id="getAllcount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM QUESTION Q
+		LEFT JOIN MEMBER_PROFILE M ON(Q.MEMBER_NO = M.MEMBER_NO)
+		LEFT JOIN RESTAURANT R ON (Q.RESTAURANT_NO = R.RESTAURANT_NO)
+ 		WHERE Q.RESTAURANT_NO IN (SELECT RESTAURANT_NO FROM RESTAURANT WHERE MEMBER_NO = #{searchVo.memberNo})
+	</select>
+		
+<!-- 	사장님 화면 detail	 -->
+	
+		<select id="ownDetail" parameterType="questionVo" resultType="questionVo">
+<!-- 	파일 경로 절대경로 수정 뒤 쿼리에추가해야 -->
+		SELECT Q.QUESTION_TITLE,Q.QUESTION_CONTENT,Q.CREATE_DATE,Q.UPDATE_DATE,Q.QUESTION_ANSWER,Q.QUESTION_NO,
+               M.MEMBER_ID,M.MEMBER_ROLE,R.RESTAURANT_NAME
+          FROM QUESTION Q, MEMBER M ,RESTAURANT R
+         WHERE (Q.MEMBER_NO = M.MEMBER_NO)
+           AND (Q.RESTAURANT_NO = R.RESTAURANT_NO)
+           AND QUESTION_NO = #{questionNo}
+	</select>
+	
+	<update id="ownUpdate" parameterType="questionVo">
+		UPDATE QUESTION
+		   SET UPDATE_DATE = SYSDATE,
+		       QUESTION_ANSWER = #{questionAnswer}
+		 WHERE QUESTION_NO = #{questionNo}
+	
+	</update>
+	
+	<select id="getFileList" parameterType="questionVo" resultType="fileVo">
+		SELECT F.*
+		FROM FILES F
+		JOIN QUESTION Q ON (F.FILE_NO = Q.FILE_NO)
+		WHERE Q.QUESTION_NO = #{questionNo}
+	</select>
+
+	
+	
+	
+
+</mapper>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">	
+	<select id="detail" parameterType="memberVo" resultType="memberVo">
+			SELECT M.MEMBER_NO, MP.MEMBER_NAME, MP.MEMBER_BIR, MP.MEMBER_GENDER, MP.MEMBER_ADD1, MP.MEMBER_ADD2,
+						MP.MEMBER_TEL, MP.MEMBER_EMAIL, MP.MEMBER_MILEAGE, MP.FILE_NO, MP.GRADE_NO,
+						M.MEMBER_ROLE,
+						G.GRADE_NAME,
+						F.FILE_SAVE_NAME AS filePath
+			FROM MEMBER M
+			JOIN MEMBER_PROFILE MP ON(M.MEMBER_NO = MP.MEMBER_NO)
+			LEFT JOIN GRADE G ON (G.GRADE_NO = MP.GRADE_NO)
+			LEFT JOIN FILES F ON (MP.FILE_NO = F.FILE_NO)
+    	WHERE M.MEMBER_NO = #{memberNo}
+	</select>
+	
+	<select id="getFilePath" parameterType="int" resultType="string">
+		SELECT NVL(FILE_PATH,'0')
+    		FROM FILES
+    		WHERE FILE_NO = #{fileNo}
+	
+	</select>
+	
+	<!-- 내가 팔로우 하는 사람 -->
+	<select id="getFollowCount" parameterType="int" resultType="int">
+		SELECT COUNT(F.MEMBER_FOLLOW_NO) AS FOLLOWER_COUNT
+		FROM FOLLOW F
+		WHERE F.MEMBER_NO = #{memberNo}
+		
+	</select>
+	<!-- 나를 팔로우 하는 사람  -->
+	<select id="getFollowingCount" parameterType="int" resultType="int">
+		SELECT COUNT(F.MEMBER_NO) AS FOLLOWER_COUNT
+		FROM FOLLOW F
+		WHERE F.MEMBER_FOLLOW_NO = #{memberNo}
+	</select>
+	
+	<select id="getGradeName" parameterType="int" resultType="String">
+	    SELECT GRADE_NAME
+        	FROM GRADE
+       	 WHERE GRADE_NO = #{gradeNo}
+	</select>
+	
+	<select id="getMemberName" parameterType="int" resultType="String">
+		SELECT MEMBER_NAME
+			FROM MEMBER_PROFILE
+			WHERE MEMBER_NO=#{memberNo}
+	</select>
+
+	<select id="selectListTotalCount" resultType="int" parameterType="pagenation">
+		SELECT COUNT(*)
+		FROM MEMBER_PROFILE M
+		LEFT JOIN 
+    		FOLLOW F ON M.MEMBER_NO = F.MEMBER_FOLLOW_NO
+		LEFT JOIN 
+    		FILES FS ON M.FILE_NO = FS.FILE_NO
+		WHERE 
+    		F.MEMBER_NO = ${searchVo.memberNo} 
+	</select>
+
+	<!-- 팔로워 (나를 팔로우 한사람) -->	
+	<select id="followerDetail" resultType="memberVo" parameterType="pagenation">
+		SELECT M.MEMBER_NAME, FS.FILE_PATH,	M.MEMBER_NO
+		FROM MEMBER_PROFILE M 
+		LEFT JOIN FOLLOW F ON M.MEMBER_NO = F.MEMBER_NO
+		LEFT JOIN FILES FS ON M.FILE_NO = FS.FILE_NO
+		WHERE F.MEMBER_FOLLOW_NO = ${searchVo.memberNo}
+		
+		ORDER BY M.MEMBER_NO DESC
+	    OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY
+	</select>
+	
+	<!-- 팔로우 (내가 팔로우 한사람) -->
+	<select id="followDetail" resultType="memberVo" parameterType="pagenation">
+		SELECT M.MEMBER_NAME, FS.FILE_PATH, M.MEMBER_NO
+		FROM MEMBER_PROFILE M
+		LEFT JOIN FOLLOW F ON M.MEMBER_NO = F.MEMBER_FOLLOW_NO
+		LEFT JOIN FILES FS ON M.FILE_NO = FS.FILE_NO
+		WHERE F.MEMBER_NO = ${searchVo.memberNo}
+		
+		ORDER BY M.MEMBER_NO DESC
+	    OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY
+	</select>
+
+	<update id="profileUpdate" parameterType="memberVo">
+		UPDATE MEMBER_PROFILE
+		SET 
+				MEMBER_NAME = #{memberName},
+				MEMBER_BIR = TO_DATE(#{memberBir}),
+				MEMBER_ADD1 = #{memberAdd1},
+				MEMBER_ADD2 = #{memberAdd2},
+				MEMBER_TEL = #{memberTel},
+				MEMBER_EMAIL = #{memberEmail}
+				<if test="fileNo != null and fileNo != ''">
+					, FILE_NO = #{fileNo}
+				</if>
+		WHERE MEMBER_NO = #{memberNo}
+	</update>
+	
+	<select id="followMember" parameterType="memberVo" resultType="memberVo">
+		
+		SELECT F.FOLLOW_NO
+        	FROM MEMBER M , FOLLOW F
+        	WHERE M.MEMBER_NO = F.MEMBER_NO
+        		AND M.MEMBER_NO = #{memberNo}
+       	 		AND F.MEMBER_FOLLOW_NO = #{targetNo}
+		
+	</select>
+	
+	<insert id="follow" parameterType="memberVo" >
+		INSERT INTO FOLLOW
+			VALUES (FOLLOW_SEQ.NEXTVAL,#{targetNo},#{memberNo})    
+	
+	</insert>
+	
+	<delete id="cancelFollow" parameterType="memberVo">
+		DELETE FROM FOLLOW
+		WHERE MEMBER_NO = #{memberNo} 
+		AND MEMBER_FOLLOW_NO =#{targetNo} 
+	</delete>
+
+	<!-- 찜한 식당 카운트 -->
+	<select id="pickCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS PICK_CNT
+			FROM PICK
+			WHERE MEMBER_NO = #{memberNo}
+	</select>
+
+	<!-- 예약 카운트 -->
+	<select id="reservationCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS RESERVATION_CNT
+			FROM RESERVATION
+			WHERE MEMBER_NO = #{memberNo}
+			AND DELYN = 'N'
+	</select>
+
+	<!-- 쿠폰 카운트 -->
+	<select id="couponCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS COUPON_CNT
+			FROM MEMBER_COUPON
+			WHERE MEMBER_NO = #{memberNo}
+			AND PAY_NO IS NULL
+	</select>
+
+	<!-- 문의 카운트 -->
+	<select id="questionCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS QUESTION_CNT
+			FROM QUESTION
+			WHERE MEMBER_NO = #{memberNo}
+	</select>
+
+	<!-- 리뷰 카운트 -->
+	<select id="reviewCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS REVIEW_CNT
+			FROM REVIEW
+			WHERE MEMBER_NO = #{memberNo}
+			AND DELYN = 'N'
+	</select>
+
+	<!-- 카트 카운트 -->
+	<select id="cartCnt" resultType="int" parameterType="int">
+			SELECT COUNT(*) AS CART_CNT
+			FROM CART
+			WHERE MEMBER_NO = #{memberNo}
+	</select>
+
+	<!-- 찜하기 -->
+	<insert id="restaurantPick" parameterType="restaurantVo">
+		INSERT INTO PICK
+		VALUES(#{memberNo}, #{restaurantNo})
+	</insert>
+
+	<!-- 찜 취소 -->
+	<delete id="restaurantPickDelete" parameterType="restaurantVo">
+		DELETE PICK
+		WHERE MEMBER_NO = #{memberNo}
+		AND RESTAURANT_NO = #{restaurantNo}
+	</delete>
+	
+
+    <!--김은영 (admin 회원관리화면) -->
+    <select id="list" resultType="memberVo" parameterType="memberVo">
+			SELECT M.MEMBER_NO, M.MEMBER_ID,M.CREATE_DATE ,M.REMOVE_DATE,MP.MEMBER_NAME,MP.GRADE_NO
+			FROM MEMBER M , MEMBER_PROFILE MP
+			WHERE M.MEMBER_NO = MP.MEMBER_NO 
+    </select>
+    
+    <select id="getAllCount" parameterType="pagenation" resultType="int" >
+			SELECT COUNT(*)
+			FROM MEMBER
+	</select>
+	
+	<select id ="memberDetail" resultType="memberVo" parameterType="memberVo">
+			SELECT M.* ,MP.* 
+			FROM MEMBER M ,MEMBER_PROFILE MP 
+			WHERE M.MEMBER_NO = MP.MEMBER_NO
+			AND M. MEMBER_NO = #{memberNo}
+  
+	</select>
+	
+	<select id="mileageSelect" resultType="memberVo" parameterType="memberVo">
+			SELECT 
+				    (SELECT SUM(MILEAGE_POINT) 
+				     FROM MILEAGE 
+				     WHERE MILEAGE_USED = 1
+				     AND MEMBER_NO = #{memberNo}) 
+				  - 
+				    (SELECT SUM(MILEAGE_POINT) 
+				     FROM MILEAGE 
+				     WHERE MILEAGE_USED = 0
+				     AND MEMBER_NO = #{memberNo}) AS MILEAGE_DIFFERENCE
+				FROM DUAL
+	</select>
+			
+	<select id ="getFileList" parameterType="memberVo" resultType="fileVo">
+		    SELECT * 
+			FROM FILES F ,MEMBER_PROFILE MP
+			WHERE F.FILE_NO = MP.FILE_NO
+			AND MP.MEMBER_NO = #{memberNo}
+	
+	</select>
+	
+	<select id="MileageList" parameterType="memberVo" resultType="MileageVo">
+			SELECT MILEAGE_USED ,MILEAGE_POINT ,CREATE_DATE
+			FROM MILEAGE
+			WHERE MEMBER_NO = #{memberNo}
+	
+	</select>
+	
+	<insert id ="mileageInsert" parameterType="MileageVo">
+			INSERT INTO MILEAGE (MILEAGE_NO, MEMBER_NO, MILEAGE_USED, CREATE_DATE, MILEAGE_POINT)
+            VALUES (MILEAGE_SEQ.NEXTVAL,#{memberNo}, #{mileageUsed}, SYSDATE, #{mileagePoint})
+	
+	</insert>
+	
+	<update id="memberGradeUpdate" parameterType="gradeVo">
+			UPDATE MEMBER_PROFILE
+			   SET GRADE_NO = #{gradeNo}
+			 WHERE MEMBER_NO =#{memberNo}
+	</update>
+	
+		<update id="memberGradeUpdate2" parameterType="gradeVo">
+			UPDATE MEMBER_PROFILE
+			   SET GRADE_NO = #{gradeNo}
+			 WHERE MEMBER_NO =#{memberNo}
+	</update>
+	
+	<select id="adminMemberCoupon" resultType="CouponVo" parameterType="memberVo">
+		SELECT MC.MEMBER_NO,MC.COUPON_NO,MC.PAY_NO,MC.USE_DATE,C.COUPON_PRICE, C.COUPON_NAME,C.CREATE_DATE
+		FROM MEMBER_COUPON MC , COUPON C
+		WHERE MC.COUPON_NO = C.COUPON_NO
+		AND MEMBER_NO =#{memberNo}
+		
+	</select>
+	
+	
+	<!-- 김영신 결제후 마일리지 차감,적립 업뎃 -->
+	<update id="mileageUpdate" parameterType="memberVo">
+		UPDATE MEMBER_PROFILE
+		SET MEMBER_MILEAGE = #{memberMileage}
+		WHERE MEMBER_NO = #{memberNo}
+	</update>
+		
+	<select id="getMileage" parameterType="memberVo" resultType="int">
+		SELECT MEMBER_MILEAGE
+		FROM MEMBER_PROFILE
+		WHERE MEMBER_NO = #{memberNo}
+	</select>
+
+	
+	<select id="memberCoupon" resultType="memberVo" parameterType="memberVo">
+		SELECT MC.MEMBER_NO,MC.COUPON_NO,MC.PAY_NO,MC.USE_DATE,C.COUPON_PRICE, C.COUPON_NAME,C.CREATE_DATE
+		FROM MEMBER_COUPON MC , COUPON C
+		WHERE MC.COUPON_NO = C.COUPON_NO
+		AND MEMBER_NO =#{memberNo}
+		
+	</select>
+
+
+</mapper>

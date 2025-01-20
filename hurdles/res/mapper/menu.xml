@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menu">
+
+  <select id="getMenuNo"  resultType="int">
+    SELECT MENU_SEQ.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getProductNo"  resultType="int">
+    SELECT PRODUCT_SEQ.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getReserveProductNo"  resultType="int">
+    SELECT RESERVE_PRODUCT_SEQ.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="list" parameterType="int" resultType="menuVo">
+    SELECT M.*, F.*
+    FROM MENU M
+    LEFT JOIN FILES F ON(M.FILE_NO = F.FILE_NO)
+    WHERE RESTAURANT_NO = #{restaurantNo}
+  </select>
+
+  <select id="menuList" parameterType="menuVo" resultType="menuVo">
+    SELECT M.*, F.*
+    FROM MENU M
+    LEFT JOIN FILES F ON(M.FILE_NO = F.FILE_NO)
+    WHERE RESTAURANT_NO = #{restaurantNo}
+    ORDER BY M.CREATE_DATE DESC
+  </select>
+
+  <select id="productList" parameterType="productVo" resultType="productVo">
+    SELECT P.*, F.*
+    FROM PRODUCT P
+    LEFT JOIN FILES F ON(P.FILE_NO = F.FILE_NO)
+    WHERE RESTAURANT_NO = #{restaurantNo}
+    ORDER BY P.CREATE_DATE DESC
+  </select>
+
+
+  <select id="menuDetail" parameterType="menuVo" resultType="menuVo">
+    SELECT M.*, F.*
+    FROM MENU M
+    LEFT JOIN FILES F ON(M.FILE_NO = F.FILE_NO)
+    WHERE MENU_NO = #{menuNo}
+  </select>
+
+  <select id="productDetail" parameterType="productVo" resultType="productVo">
+    SELECT P.*, F.*
+    FROM PRODUCT P
+    LEFT JOIN FILES F ON(P.FILE_NO = F.FILE_NO)
+    WHERE PRODUCT_NO = #{productNo}
+  </select>
+
+
+  <insert id="menuInsert" parameterType="menuVo">
+    INSERT INTO MENU(
+      MENU_NO, MENU_NAME, MENU_PRICE,
+      RESTAURANT_NO
+      <if test="menuDes != null and menuDes != ''">
+				, MENU_DES
+			</if>
+      <if test="fileNo != null and fileNo != ''">
+				, FILE_NO
+			</if>
+    ) VALUES(
+      #{menuNo}, #{menuName},  #{menuPrice},
+      #{restaurantNo}
+      <if test="menuDes != null and menuDes != ''">
+				, #{menuDes}
+			</if>
+      <if test="fileNo != null and fileNo != ''">
+				, #{fileNo}
+			</if>
+    )
+  </insert>
+
+  <insert id="productInsert" parameterType="productVo">
+    INSERT INTO PRODUCT(
+      PRODUCT_NO, PRODUCT_NAME, PRODUCT_PRICE,
+      RESTAURANT_NO
+      <if test="productDes != null and productDes != ''">
+				, PRODUCT_DES
+			</if>
+      <if test="fileNo != null and fileNo != ''">
+				, FILE_NO
+			</if>
+    ) VALUES(
+      #{productNo}, #{productName},  #{productPrice},
+      #{restaurantNo}
+      <if test="productDes != null and productDes != ''">
+				, #{productDes}
+			</if>
+      <if test="fileNo != null and fileNo != ''">
+				, #{fileNo}
+			</if>
+    )
+  </insert>
+
+
+  <update id="menuUpdate" parameterType="menuVo">
+      UPDATE MENU SET
+      MENU_NAME = #{menuName},
+      MENU_DES = #{menuDes},
+      MENU_PRICE = #{menuPrice}
+      <if test="fileNo != null and fileNo != ''">
+				, FILE_NO = #{fileNo}
+			</if>
+      WHERE MENU_NO = #{menuNo}
+  </update>
+
+  <update id="productUpdate" parameterType="productVo">
+      UPDATE PRODUCT SET
+      PRODUCT_NAME = #{productName},
+      PRODUCT_DES = #{productDes},
+      PRODUCT_PRICE = #{productPrice}
+      <if test="fileNo != null and fileNo != ''">
+				, FILE_NO = #{fileNo}
+			</if>
+      WHERE PRODUCT_NO = #{productNo}
+  </update>
+
+  <update id="reserveProductUpdate" parameterType="productVo">
+      UPDATE RESERVE_PRODUCT SET
+      RESERVE_PRODUCT_NAME = #{reserveProductName},
+      RESERVE_PRODUCT_DES = #{reserveProductDes},
+      RESERVE_PRODUCT_COUNT = #{reserveProductCount}
+      <if test="fileNo != null and fileNo != ''">
+				, FILE_NO = #{fileNo}
+			</if>
+      WHERE RESERVE_PRODUCT_NO = #{reserveProductNo}
+  </update>
+
+  <delete id="menuDelete" parameterType="menuVo">
+    DELETE FROM MENU
+    WHERE MENU_NO = #{menuNo}
+  </delete>
+
+  <delete id="productDelete" parameterType="productVo">
+    DELETE FROM PRODUCT
+    WHERE PRODUCT_NO = #{productNo}
+  </delete>
+</mapper>

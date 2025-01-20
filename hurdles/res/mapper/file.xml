@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="file">
+	<select id="getFileNo" resultType="int">
+		SELECT NVL(MAX(FILE_NO), 0) + 1
+		FROM FILES
+	</select>
+
+	<insert id="addFile" parameterType="list">
+	    INSERT ALL
+	    <foreach collection="list" item="file">
+	        INTO FILES (FILE_NO, FILE_SN, FILE_PATH, FILE_ORG_NAME, FILE_SAVE_NAME, FILE_EXT, FILE_SIZE, CREATE_DATE, DELYN)
+	        VALUES (#{file.fileNo}, #{file.fileSn}, #{file.filePath}, #{file.fileOrgName}, #{file.fileSaveName}, #{file.fileExt}, #{file.fileSize}, SYSDATE, 'N')
+	    </foreach>
+	    SELECT 1 FROM DUAL
+	</insert>
+
+	<update id="deleteFiles" parameterType="int[]">
+			UPDATE FILES
+			SET DELYN = 'Y'
+			WHERE FILE_NO IN
+			<foreach collection="array" item="id" open="(" separator="," close=")">
+					#{id}
+			</foreach>
+	</update>
+
+	<select id="getFileList" resultType="fileVo" parameterType="int[]">
+		SELECT *
+		FROM FILES
+		WHERE FILE_NO IN (
+			<foreach collection="array" item="id" separator=",">
+					#{id}
+			</foreach>
+		)
+	</select>
+
+	<insert id="insertBoardFile" parameterType="list">
+		INSERT INTO BOARD_FILE
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.board_no}, #{item.file_no}
+			)
+		</foreach>
+	</insert>
+	
+	<select id="boardFileList" resultType="fileVo" parameterType="int">
+		SELECT F.*
+		FROM FILES F
+		JOIN BOARD_FILE BF ON (BF.FILE_NO = F.FILE_NO)
+		WHERE BF.BOARD_NO = #{boardNo}
+		AND F.DELYN = 'N'
+		ORDER BY F.FILE_SN
+	</select>
+</mapper>

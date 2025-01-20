@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="coupon">
+	<select id="list" resultType="couponVo" parameterType="couponVo">
+		SELECT C.*,
+    (SELECT 'Y' FROM MEMBER_COUPON WHERE MEMBER_NO = #{memberNo} AND COUPON_NO = C.COUPON_NO) AS ISSUED
+		FROM COUPON C
+		JOIN RESTAURANT R ON (C.RESTAURANT_NO = R.RESTAURANT_NO)
+		LEFT JOIN restaurant R ON (R.restaurant_no = C.restaurant_no)
+		WHERE R.RESTAURANT_NO = #{restaurantNo}
+		<![CDATA[AND C.END_DATE > SYSDATE]]>
+		ORDER BY C.CREATE_DATE
+	</select>
+
+	<select id="issuedList" resultType="couponVo" parameterType="pagenation">
+		SELECT *
+		FROM MEMBER_COUPON MC
+		JOIN COUPON C ON(C.COUPON_NO = MC.COUPON_NO)
+		LEFT JOIN restaurant R ON (R.restaurant_no = C.restaurant_no)
+		WHERE MC.MEMBER_NO = #{searchVo.memberNo}
+			<if test="pageMap.used == null">
+				AND MC.PAY_NO IS NULL
+			</if>
+			<if test="pageMap.used != null">
+				AND MC.PAY_NO IS NOT NULL
+			</if>
+		ORDER BY C.CREATE_DATE
+		OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY
+	</select>
+
+	<insert id="issued" parameterType="couponVo">
+		INSERT INTO MEMBER_COUPON(MEMBER_NO, COUPON_NO)
+		VALUES(#{memberNo},  #{couponNo})
+	</insert>
+	
+	<select id="memberCouponList" resultType="couponVo" parameterType="couponVo">
+	   SELECT *
+	   FROM MEMBER_COUPON MC, COUPON C
+	   WHERE MC.COUPON_NO = C.COUPON_NO
+	   AND MEMBER_NO = #{memberNo}
+	   AND MC.PAY_NO IS NULL
+	   AND C.restaurant_no = #{restaurantNo}
+	   <!-- 레스토랑 넘버 넣어 주기 --> 
+	   <!-- 사용 불가능한 날은 제외 -->
+	   <![CDATA[AND C.END_DATE > SYSDATE]]>
+	   AND DELYN = 'N'
+	</select>
+
+	
+<!-- 	<insert id="insert"  parameterType="CouponVo"> -->
+<!-- 		INSERT INTO COUPON ( -->
+<!--    							 COUPON_NO, -->
+<!--     						 RESTAURANT_NO, -->
+<!--     						 COUPON_NAME, -->
+<!--     						 COUPON_DES, -->
+<!--     						 COUPON_PRICE, -->
+<!--     						 START_DATE, -->
+<!--     	 					 END_DATE, -->
+<!--     						 CREATE_DATE, -->
+<!--     						 DELYN -->
+<!-- 							) -->
+<!-- 					VALUES ( -->
+<!--     						COUPON_SEQ.NEXTVAL, -->
+<!-- 						    #{restaurantNo}, -->
+<!--     						#{couponName}, -->
+<!--     						#{couponDes},  -->
+<!--     						#{couponPrice}, -->
+<!--     						TO_DATE('#{startDate}', 'YYYY-MM-DD'), -->
+<!--     						TO_DATE('#{endDate}', 'YYYY-MM-DD'),  -->
+<!--     						SYSDATE, -->
+<!--     						'N' -->
+<!-- 							) -->
+<!-- 	</insert> -->
+	
+	<insert id="insert"  parameterType="CouponVo">
+		INSERT INTO COUPON (
+   							 COUPON_NO,
+    						 RESTAURANT_NO,
+    						 COUPON_NAME,
+    						 COUPON_DES,
+    						 COUPON_PRICE,
+    						 START_DATE,
+    	 					 END_DATE,
+    						 CREATE_DATE,
+    						 DELYN
+							)
+					VALUES (
+    						COUPON_SEQ.NEXTVAL,
+						    #{restaurantNo},
+    						#{couponName},
+    						#{couponDes}, 
+    						#{couponPrice},
+    						TO_DATE(#{startDate}, 'YYYY-MM-DD'),
+    						TO_DATE(#{endDate}, 'YYYY-MM-DD'), 
+    						SYSDATE,
+    						'N'
+							)
+	</insert>
+	
+	<update id="memberCouponInsert" parameterType="couponVo">
+		UPDATE MEMBER_COUPON
+		SET PAY_NO = #{payNo}, USE_DATE=SYSDATE
+		WHERE MEMBER_NO = #{memberNo}
+		AND COUPON_NO = #{couponNo}
+	</update>
+</mapper>

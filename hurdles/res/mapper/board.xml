@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+	<select id="getBoardNo" resultType="int">
+		<!-- SELECT SEQ_BOARD_T_NO.NEXTVAL FROM DUAL -->
+		SELECT NVL(MAX(BOARD_NO), 0) + 1 FROM BOARD
+	</select>
+	
+	<select id="selectListTotalCount" resultType="int" parameterType="pagenation">
+		SELECT COUNT(*)
+		FROM BOARD B
+		JOIN MEMBER M ON (B.MEM_NO = M.MEM_NO)
+		WHERE B.DELYN = 'N' 
+		<if test="searchVo.title != null and searchVo.title != ''">
+			AND TITLE LIKE '%'||#{searchVo.title}||'%'
+		</if>
+		<if test="searchVo.memName != null and searchVo.memName != ''">
+			AND M.MEM_NAME LIKE '%'||#{searchVo.memName}||'%'
+		</if>   
+	</select>
+
+	<select id="list" resultType="boardVo" parameterType="pagenation">
+		SELECT B.*, M.MEM_NAME
+		FROM BOARD B
+		JOIN MEMBER M ON (B.MEM_NO = M.MEM_NO)
+		WHERE B.DELYN = 'N' 
+		<if test="searchVo.title != null and searchVo.title != ''">
+			AND TITLE LIKE '%'||#{searchVo.title}||'%'
+		</if>
+		<if test="searchVo.memName != null and searchVo.memName != ''">
+			AND M.MEM_NAME LIKE '%'||#{searchVo.memName}||'%'
+		</if>
+		ORDER BY B.REG_DATE DESC
+	    OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY
+	</select>
+
+	<select id="detail" resultType="boardVo" parameterType="int">
+		SELECT B.*, M.MEM_NAME
+		FROM
+		BOARD B
+		JOIN MEMBER M ON (B.MEM_NO = M.MEM_NO)
+		WHERE B.BOARD_NO = #{boardNo}
+	</select>	
+	
+	<insert id="insert" parameterType="boardVo">
+		INSERT INTO BOARD (BOARD_NO, TITLE, CONTENT, MEM_NO, CODE_NO)
+		VALUES(#{boardNo}, #{title}, #{content}, 1, 1)
+	</insert>
+	
+	<update id="update" parameterType="boardVo">
+		UPDATE BOARD SET 
+		TITLE = #{title},
+		CONTENT = #{content}
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+	<update id="delete" parameterType="boardVo">
+		UPDATE BOARD SET
+		DELYN = 'Y' 
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+	
+
+</mapper>

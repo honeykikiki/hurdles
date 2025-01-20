@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="auth">
+
+	<select id="login" parameterType="memberVo" resultType="memberVo">
+		SELECT MEMBER_NO
+		FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+		AND MEMBER_PW = #{memberPw}
+		AND DELYN = 'N'
+	</select>
+	
+	<select id="detail" parameterType="memberVo" resultType="memberVo">
+		SELECT M.MEMBER_NO, MP.MEMBER_NAME, MP.MEMBER_BIR, MP.MEMBER_GENDER, MP.MEMBER_ADD1, MP.MEMBER_ADD2,
+					MP.MEMBER_TEL, MP.MEMBER_EMAIL, MP.MEMBER_MILEAGE, MP.FILE_NO, MP.GRADE_NO,
+					M.MEMBER_ROLE
+		FROM MEMBER M
+		JOIN MEMBER_PROFILE MP ON(M.MEMBER_NO = MP.MEMBER_NO)
+		WHERE M.MEMBER_NO = #{memberNo}
+	</select>
+
+	<select id="validEmail" parameterType="memberVo" resultType="memberVo">
+		SELECT MEMBER_NO
+		FROM MEMBER_PROFILE
+		WHERE MEMBER_EMAIL = #{memberEmail}
+	</select>
+
+	<select id="validId" parameterType="memberVo" resultType="memberVo">
+		SELECT MEMBER_NO
+		FROM MEMBER
+		WHERE MEMBER_ID = #{memberId}
+		AND DELYN = 'N'
+	</select>
+
+	<insert id="join" parameterType="memberVo">
+		INSERT INTO MEMBER(MEMBER_NO, MEMBER_ID, MEMBER_PW, MEMBER_ROLE)
+		VALUES(#{memberNo}, #{memberId}, #{memberPw}, #{memberRole})
+	</insert>
+
+	<insert id="joinProfile" parameterType="memberVo">
+		INSERT INTO MEMBER_PROFILE (
+				MEMBER_NO,
+				MEMBER_NAME,
+				MEMBER_BIR,
+				MEMBER_GENDER,
+				MEMBER_ADD1,
+				MEMBER_ADD2,
+				MEMBER_TEL,
+				MEMBER_EMAIL
+		) VALUES(
+			#{memberNo},
+			#{memberName},
+			#{memberBir},
+			#{memberGender},
+			#{memberAdd1},
+			#{memberAdd2},
+			#{memberTel},
+			#{memberEmail}
+		)
+	</insert>
+
+	<select id="getMemberNo" resultType="int">
+		SELECT MEMBER_SEQ.NEXTVAL FROM DUAL
+	</select>
+
+	<select id="idFind" parameterType="memberVo" resultType="memberVo">
+		SELECT M.MEMBER_ID
+		FROM MEMBER M
+		JOIN MEMBER_PROFILE MP ON(M.MEMBER_NO = MP.MEMBER_NO)
+		WHERE MP.MEMBER_NAME = #{memberName}
+		AND MP.MEMBER_EMAIL = #{memberEmail}
+	</select>
+
+	<select id="pwFind" parameterType="memberVo" resultType="memberVo">
+		SELECT M.MEMBER_NO
+		FROM MEMBER M
+		JOIN MEMBER_PROFILE MP ON(M.MEMBER_NO = MP.MEMBER_NO)
+		WHERE M.MEMBER_ID = #{memberId}
+		AND MP.MEMBER_EMAIL = #{memberEmail}
+	</select>
+
+	<update id="delete" parameterType="memberVo">
+		UPDATE MEMBER
+		SET DELYN = 'Y'
+		WHERE MEMBER_NO = #{memberNo}
+	</update>
+</mapper>

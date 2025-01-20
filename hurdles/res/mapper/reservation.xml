@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reservation">
+	<select id="reservationList" parameterType="reservationVo" resultType="reservationVo">
+		SELECT RV.RESERVATION_NO, RT.RESTAURANT_NO, RP.RESERVE_PRODUCT_NO, 
+		       RT.RESTAURANT_NAME, RT.RESTAURANT_TEL, RV.RESERVE_DATE, RV.RESERVE_TIME, RV.GUESTS
+		  FROM RESERVATION RV, RESTAURANT RT, RESERVE_PRODUCT RP
+		 WHERE RP.RESTAURANT_NO = RT.RESTAURANT_NO
+		   AND RV.RESERVE_PRODUCT_NO = RP.RESERVE_PRODUCT_NO
+		   AND RV.MEMBER_NO= #{memberNo}
+		   AND RV.DELYN = 'N'
+		 ORDER BY 1 DESC
+	</select>
+	
+	<select id="reservationDetail" parameterType="reservationVo" resultType="reservationVo">
+		SELECT RV.RESERVATION_NO, RT.RESTAURANT_NO, RP.RESERVE_PRODUCT_NO, 
+		       RT.RESTAURANT_NAME, RT.RESTAURANT_TEL, RV.RESERVE_DATE, RV.RESERVE_TIME, RV.GUESTS,
+		       RP.RESERVE_PRODUCT_NAME, RT.RESTAURANT_ADD1||''||RT.RESTAURANT_ADD2 AS ADDR
+		  FROM RESERVATION RV, RESTAURANT RT, RESERVE_PRODUCT RP
+		 WHERE RP.RESTAURANT_NO = RT.RESTAURANT_NO
+		   AND RV.RESERVE_PRODUCT_NO = RP.RESERVE_PRODUCT_NO
+		   AND RV.MEMBER_NO= #{memberNo}
+		   AND RV.RESERVATION_NO= #{reservationNo}
+	</select>
+	
+	<update id="reservationDelete" parameterType="reservationVo">
+	 	UPDATE RESERVATION
+		   SET DELYN='Y'
+		 WHERE RESERVATION_NO = #{reservationNo}
+	</update>
+	
+	<insert id="reservationInsert" parameterType="reservationVo">
+		INSERT INTO RESERVATION(RESERVATION_NO, RESERVE_PRODUCT_NO, MEMBER_NO, 
+					CREATE_DATE, RESERVE_DATE, RESERVE_TIME, GUESTS, DELYN)
+		VALUES (RESERVATION_SEQ.NEXTVAL, #{reserveProductNo}, #{memberNo}, SYSDATE, 
+			    TO_DATE(#{reserveDate}, 'YYYY/MM/DD'), #{reserveTime}, #{guests}, 'N')
+	</insert>	
+	
+	<!-- 	관리자화면 작업중 김은영 -->
+	   <select id="adminReservationList" resultType="reservationVo">
+				SELECT R.DELYN, R.CREATE_DATE, R.RESERVE_DATE, R.RESERVE_TIME, R.GUESTS,
+									MP.MEMBER_NO, MP.MEMBER_NAME, 
+									RS.RESTAURANT_NO, RS.RESTAURANT_NAME
+				FROM RESERVATION R
+				LEFT JOIN MEMBER_PROFILE MP ON R.MEMBER_NO = MP.MEMBER_NO
+        LEFT JOIN RESERVE_PRODUCT RP ON RP.RESERVE_PRODUCT_NO = R.RESERVE_PRODUCT_NO
+        JOIN RESTAURANT RS ON RP.RESTAURANT_NO = RS.RESTAURANT_NO
+		</select>
+		
+	     <select id="getAllCount" parameterType="pagenation" resultType="int" >
+			SELECT COUNT(*)
+			FROM RESERVATION 
+	     </select>
+	     
+		 <select id="ownList" parameterType="reservationVo" resultType="reservationVo">
+			<!-- SELECT *
+			FROM RESERVATION R
+			LEFT JOIN RESERVE_PRODUCT PROD ON (R.RESERVE_PRODUCT_NO = PROD.PRODUCT_NO)
+			LEFT JOIN RESTAURANT RES ON (PROD.RESTAURANT_NO = RES.RESTAURANT_NO)
+			LEFT JOIN MEMBER_PROFILE M ON (R.MEMBER_NO = M.MEMBER_NO)
+			WHERE RES.MEMBER_NO = #{memberNo}
+			AND R.DELYN='N'
+			ORDER BY R.RESERVE_DATE -->
+			
+			SELECT *
+			FROM RESERVATION R
+			LEFT JOIN RESERVE_PRODUCT PROD ON (R.RESERVE_PRODUCT_NO = PROD.RESERVE_PRODUCT_NO)
+			LEFT JOIN RESTAURANT RES ON (PROD.RESTAURANT_NO = RES.RESTAURANT_NO)
+			LEFT JOIN MEMBER_PROFILE M ON (R.MEMBER_NO = M.MEMBER_NO)
+			WHERE RES.MEMBER_NO = #{memberNo}
+			AND R.DELYN='N'
+			ORDER BY R.RESERVE_DATE
+		</select>
+		
+		<update id="ownDelete" parameterType="reservationVo">
+		UPDATE RESERVATION 
+		SET DELYN='Y'
+		WHERE RESERVATION_NO = #{reservationNo}
+		
+		</update>
+			
+</mapper>

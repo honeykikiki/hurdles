@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- DB 정보 파일 -->
+    <properties resource="db.properties" />
+    
+	<settings>
+		<!-- 디비에서 값을 카멜케이스로 바꿔 준다. -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+
+    <!-- 별칭 설정 -->
+    <typeAliases>
+        <typeAlias type="kr.or.ddit.vo.FileVo" alias="fileVo" />
+        <typeAlias type="kr.or.ddit.vo.BoardVo" alias="boardVo" />
+        <typeAlias type="kr.or.ddit.util.Pagenation" alias="pagenation" />
+        <typeAlias type="kr.or.ddit.vo.MemberVo" alias="memberVo" />
+        <typeAlias type="kr.or.ddit.vo.RestaurantVo" alias="restaurantVo" />
+        <typeAlias type="kr.or.ddit.vo.LocalVo" alias="localVo" />
+        <typeAlias type="kr.or.ddit.vo.RestaurantCodeVo" alias="restaurantCodeVo" /> 
+        <typeAlias type="kr.or.ddit.vo.ReservationVo" alias="reservationVo" />
+        <typeAlias type="kr.or.ddit.vo.QuestionVo" alias="questionVo" />
+
+        <typeAlias type="kr.or.ddit.vo.ReviewVo" alias="reviewVo" />
+        <typeAlias type="kr.or.ddit.vo.ReviewReportVo" alias="reviewReportVo" />
+        <typeAlias type="kr.or.ddit.vo.CouponVo" alias="couponVo" />
+        <typeAlias type="kr.or.ddit.vo.ProductVo" alias="productVo" />
+
+
+        <typeAlias type="kr.or.ddit.vo.MileageVo" alias="mileageVo" />
+        <typeAlias type="kr.or.ddit.vo.MenuVo" alias="menuVo" />
+        <typeAlias type="kr.or.ddit.vo.PayVo" alias="payVo"/> 
+        <typeAlias type="kr.or.ddit.vo.CartVo" alias="cartVo"/> 
+        <typeAlias type="kr.or.ddit.vo.OrdersVo" alias="ordersVo"/> 
+  
+
+        
+
+        <typeAlias type="kr.or.ddit.vo.GradeVo" alias="gradeVo" />
+
+    </typeAliases>
+
+    <!-- 환경 설정 -->
+    <environments default="dev">
+        <environment id="dev">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${user}" />
+                <property name="password" value="${pw}" />
+                <property name="poolMaximumActiveConnections" value="1" />
+                <property name="poolMaximumIdleConnections" value="1" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 매퍼 파일 설정 -->
+    <mappers>
+        <mapper resource="mapper/black.xml" />
+        <mapper resource="mapper/board.xml" />
+        <mapper resource="mapper/file.xml" />
+        <mapper resource="mapper/member.xml" />
+        <mapper resource="mapper/auth.xml" />
+        <mapper resource="mapper/restaurant.xml" />
+        <mapper resource="mapper/faq.xml" />
+        <mapper resource="mapper/notice.xml" />
+        <mapper resource="mapper/notification.xml"/>
+        <mapper resource="mapper/local.xml" />
+        <mapper resource="mapper/restaurantCode.xml" />
+        <mapper resource="mapper/reservation.xml" />
+        <mapper resource="mapper/question.xml" />
+
+        <mapper resource="mapper/review.xml" />
+        <mapper resource="mapper/reviewReport.xml" />
+        <mapper resource="mapper/coupon.xml" />
+        <mapper resource="mapper/product.xml" />
+
+
+        <mapper resource="mapper/mileage.xml" />
+        <mapper resource="mapper/menu.xml" />
+		<mapper resource="mapper/pay.xml" />
+		<mapper resource="mapper/cart.xml" />
+        <mapper resource="mapper/orders.xml"/>
+        
+		<mapper resource="mapper/grade.xml" />
+		<mapper resource="mapper/ownReview.xml"/>
+		
+    </mappers>
+    
+
+</configuration>
+

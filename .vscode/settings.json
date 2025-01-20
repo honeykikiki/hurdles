@@ -1,0 +1,10 @@
+{
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
+  "eslint.nodePath": "fe/hurdles/.yarn/sdks",
+  "prettier.prettierPath": "fe/hurdles/.yarn/sdks/prettier/index.cjs",
+  "typescript.tsdk": "fe/hurdles/.yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

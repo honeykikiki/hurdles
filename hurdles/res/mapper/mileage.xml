@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mileage">
+
+	 
+
+	<select id="list" resultType="MileageVo" parameterType="pagenation">
+		 SELECT MILE.*, M.MEMBER_NAME,
+		 CASE
+          	 	 WHEN (MILEAGE_USED = '1') THEN '+'||MILEAGE_POINT
+            	  ELSE '-'||MILEAGE_POINT
+     	   	 END AS used_Mileage
+        FROM Mileage MILE 
+        LEFT JOIN MEMBER_PROFILE M ON(M.MEMBER_NO = MILE.MEMBER_NO)
+        WHERE M.MEMBER_NO = #{pageMap.memberNo}
+        ORDER BY MILE.CREATE_DATE DESC
+<!-- 		<if test="searchVo.memberName != null and searchVo.memberName != ''"> -->
+<!-- 			AND MEMBER_NAME LIKE '%'||#{searchVo.memberName}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="searchVo.memName != null and searchVo.memName != ''"> -->
+<!-- 			AND MEM.MEMBER_NAME LIKE '%'||#{searchVo.memberName}||'%' -->
+<!-- 		</if> -->
+		
+<!-- 	    OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY -->
+	</select>
+
+	<select id="getAllCount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM Mileage
+		WHERE MILEAGE_NO = #{searchVo.mileageNo}
+		<where>
+			<if test="searchVo.mileageNO != null and searchVo.mileageNO != ''">
+				AND MILEAGE_NO '%'||#{searchVo.mileageNO}||'%'
+			</if>
+		</where>
+	</select>
+
+	
+
+</mapper>

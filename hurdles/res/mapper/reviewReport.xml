@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reviewReport">
+
+	
+	
+	<update id="reviewDelete" parameterType="reviewReportVo">
+		
+        DELETE FROM REVIEW_REPORT
+        WHERE REVIEW_REPORT_NO = #{reviewReportNo}
+	
+	</update>
+			
+	<update id="update" parameterType="reviewReportVo">
+			UPDATE REVIEW_REPORT SET 
+			REVIEW_REPORT_ACTION = #{reviewReportAction}
+			WHERE REVIEW_REPORT_NO =#{reviewReportNo}
+	</update>
+	
+<!-- 	</select> -->
+	<select id="reviewReportDetail" resultType="reviewReportVo" parameterType="pagenation">
+	SELECT 	RR.REVIEW_REPORT_NO 		AS REVIEW_REPORT_NO,
+			   RR.REVIEW_REPORT_ACTION AS REVIEW_REPORT_ACTION,
+               RR.MEMBER_NO         AS MEMBER_NO,
+               M.MEMBER_NAME        AS MEMBER_NAME,
+               RR.REVIEW_REPORT_DES AS REVIEW_REPORT_DES,
+               R.REVIEW_CONTENT	    AS REVIEW_CONTENT,
+               RR.CREATE_DATE 	    AS CREATE_DATE, 
+               R. REVIEW_SCORE	    AS REVIEW_SCORE,
+               RES.RESTAURANT_NAME  AS RESTAURANT_NAME,
+               RR.TARGET_MEMBER_NO  AS TARGET_MEMBER_NO,
+               MP.MEMBER_NAME	    AS TARGET_MEMBER_NAME
+		FROM Review_REPORT RR
+		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = RR.MEMBER_NO)
+        LEFT join REVIEW R ON (RR.REVIEW_NO = R.REVIEW_NO)
+        LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO)
+        LEFT JOIN MEMBER_PROFILE MP ON (MP.MEMBER_NO = RR.TARGET_MEMBER_NO)
+		WHERE R.DELYN = 'N'
+		AND  RR.REVIEW_REPORT_NO = #{REVIEW_REPORT_NO} 	
+	
+	</select>
+	
+	
+	<select id="reviewReportList" resultType="reviewReportVo" parameterType="pagenation">
+	SELECT     RR.REVIEW_REPORT_NO 		AS REVIEW_REPORT_NO,
+		       RR.REVIEW_REPORT_ACTION AS REVIEW_REPORT_ACTION,			
+               RR.MEMBER_NO         AS MEMBER_NO,
+               M.MEMBER_NAME        AS MEMBER_NAME,
+               RR.REVIEW_REPORT_DES AS REVIEW_REPORT_DES,
+               R.REVIEW_CONTENT	    AS REVIEW_CONTENT,
+               RR.CREATE_DATE 	    AS CREATE_DATE, 
+               R. REVIEW_SCORE	    AS REVIEW_SCORE,
+               RES.RESTAURANT_NAME  AS RESTAURANT_NAME,
+               RR.TARGET_MEMBER_NO  AS TARGET_MEMBER_NO,
+               MP.MEMBER_NAME	    AS TARGET_MEMBER_NAME
+		FROM Review_REPORT RR
+		LEFT join MEMBER_PROFILE M ON (M.MEMBER_NO = RR.MEMBER_NO)
+        LEFT join REVIEW R ON (RR.REVIEW_NO = R.REVIEW_NO)
+        LEFT join RESTAURANT Res ON (R.RESTAURANT_NO = Res.RESTAURANT_NO)
+        LEFT JOIN MEMBER_PROFILE MP ON (MP.MEMBER_NO = RR.TARGET_MEMBER_NO)
+		WHERE R.DELYN = 'N' 
+			<if test="searchVo.restaurantName != null and searchVo.restaurantName != ''">
+				AND RESTAURANT_NAME LIKE '%'||#{searchVo.restaurantName}||'%'
+			</if>
+
+			<if test="searchVo.reviewReportAction == 2">
+				AND REVIEW_REPORT_ACTION LIKE '%완료%'
+			</if>	
+			<if test="searchVo.reviewReportAction == 1">
+				AND REVIEW_REPORT_ACTION LIKE '%대기%'
+			</if>	
+
+		ORDER BY RR.REVIEW_REPORT_NO DESC
+	
+	</select>
+	
+	<select id="getAllCount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM REVIEW_REPORT R
+        LEFT JOIN REVIEW W ON (R.REVIEW_NO = W.REVIEW_NO)
+        LEFT JOIN RESTAURANT RES ON (W.RESTAURANT_NO = RES.RESTAURANT_NO)
+		<where>
+			<if test="searchVo.restaurantName != null and searchVo.restaurantName != ''">
+				AND RESTAURANT_NAME LIKE '%'||#{searchVo.restaurantName}||'%'
+			</if>			
+		</where>
+			<if test="searchVo.reviewReportAction != null and searchVo.reviewReportAction != ''">
+				AND REVIEW_REPORT_ACTION LIKE '%'||#{searchVo.reviewReportAction}||'%'
+			</if>	
+	</select>
+
+	<select id="getReviewReportNo" resultType="int">
+		SELECT REVIEW_REPORT_SEQ.NEXTVAL FROM DUAL
+	</select>
+
+	<insert id="reviewReportNo" parameterType="reviewReportVo">
+		INSERT INTO REVIEW_REPORT(REVIEW_REPORT_NO, REVIEW_NO, REVIEW_REPORT_DES, MEMBER_NO, TARGET_MEMBER_NO)
+		VALUES(#{reviewReportNo}, #{reviewNo}, #{reviewReportDes}, #{memberNo}, #{targetMemberNo})
+	</insert>
+</mapper>

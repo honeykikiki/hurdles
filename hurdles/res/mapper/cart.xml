@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cart">
+	<select id="list" resultType="cartVo" parameterType="cartVo">
+		SELECT C.*, P.FILE_NO, P.PRODUCT_NAME, P.PRODUCT_PRICE, R.RESTAURANT_NO, R.RESTAURANT_NAME
+		FROM CART C ,PRODUCT P, RESTAURANT R
+		WHERE C.PRODUCT_NO = P.PRODUCT_NO
+		AND P.RESTAURANT_NO = R.RESTAURANT_NO
+		AND C.MEMBER_NO = #{memberNo}
+	</select>
+	
+	<insert id="insert"  parameterType="cartVo">
+		MERGE INTO CART c
+		USING (
+				SELECT #{memberNo} AS memberNo, #{productNo} AS productNo, #{productQty} AS productQty FROM dual
+		) data
+		ON (c.MEMBER_NO = data.memberNo AND c.PRODUCT_NO = data.productNo)
+		WHEN MATCHED THEN
+				UPDATE SET c.PRODUCT_QTY = c.PRODUCT_QTY + data.productQty
+		WHEN NOT MATCHED THEN
+				INSERT (CART_NO, MEMBER_NO, PRODUCT_NO, PRODUCT_QTY)
+				VALUES (CART_SEQ.NEXTVAL, data.memberNo, data.productNo, data.productQty)
+	</insert>
+	
+	<delete id="delete" parameterType="int[]">
+		DELETE CART
+		WHERE CART_NO IN 
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateProductQty" parameterType="cartVo">
+	    UPDATE CART
+	    SET PRODUCT_QTY = #{productQty}
+	    WHERE CART_NO = #{cartNo}
+	</update>
+	
+	<select id="getCartByCartNo" parameterType="int" resultType="cartVo">
+		SELECT C.CART_NO,C.PRODUCT_QTY,P.PRODUCT_NAME,P.PRODUCT_PRICE, R.RESTAURANT_NAME, R.RESTAURANT_NO, C.PRODUCT_NO
+		FROM CART C ,PRODUCT P, RESTAURANT R
+		WHERE C.PRODUCT_NO = P.PRODUCT_NO
+        AND P.RESTAURANT_NO = R.RESTAURANT_NO
+		AND CART_NO = #{cartNo}
+	</select>
+	
+	<delete id="cartDelete" parameterType="cartVo">
+		DELETE CART
+ 		WHERE CART_NO = #{cartNo}
+	</delete>
+</mapper>

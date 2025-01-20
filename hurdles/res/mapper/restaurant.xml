@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="restaurant">
+	<select id="getNo" resultType="int">
+		SELECT RESTAURANT_SEQ.NEXTVAL FROM DUAL
+	</select>
+
+	<select id="getAllCount" parameterType="pagenation" resultType="int" >
+		SELECT COUNT(*)
+		FROM RESTAURANT
+		
+		<where>
+			
+
+			<if test="searchVo.delyn == null">
+				DELYN ='N'
+			</if>
+
+			<if test="searchVo.restaurantName != null and searchVo.restaurantName != ''">
+				AND RESTAURANT_NAME LIKE '%'||#{searchVo.restaurantName}||'%'
+			</if>
+			<if test="searchVo.restaurantAdd1 != null and searchVo.restaurantAdd1 != ''">
+				AND RESTAURANT_ADD1 LIKE '%'||#{searchVo.restaurantAdd1}||'%'
+			</if>
+			<if test="searchVo.restaurantCodeNo==2">
+				AND RESTAURANT_CODE_NO = 2
+			</if>
+			<if test="searchVo.restaurantCodeNo==3">
+				AND RESTAURANT_CODE_NO = 3
+			</if>
+			<if test="searchVo.restaurantCodeNo==4">
+				AND RESTAURANT_CODE_NO = 4
+			</if>
+			<if test="searchVo.restaurantCodeNo==5">
+				AND RESTAURANT_CODE_NO = 5
+			</if>
+			<if test="searchVo.restaurantCodeNo==6">
+				AND RESTAURANT_CODE_NO = 6
+			</if>
+			<if test="searchVo.restaurantCodeNo==7">
+				AND RESTAURANT_CODE_NO = 7
+			</if>
+			<if test="searchVo.restaurantCodeNo==8">
+				AND RESTAURANT_CODE_NO = 8
+			</if>
+			<if test="searchVo.restaurantCodeNo==9">
+				AND RESTAURANT_CODE_NO = 9
+			</if>
+			<if test="searchVo.restaurantCodeNo==10">
+				AND RESTAURANT_CODE_NO = 10
+			</if>
+			<if test="searchVo.restaurantCodeNo==11">
+				AND RESTAURANT_CODE_NO = 11
+			</if>
+
+			<if test="searchVo.memberNo != 0">
+				AND MEMBER_NO = #{searchVo.memberNo}
+			</if>
+		</where>
+	</select>
+	
+	<select id="list" parameterType="pagenation" resultType="restaurantVo">
+	
+		SELECT 
+			R.*,
+			F.*,
+			M.*, 
+			(SELECT NVL(AVG(REVIEW_SCORE),0) FROM REVIEW WHERE RESTAURANT_NO = R.RESTAURANT_NO) AS SCORE
+		FROM RESTAURANT R
+		LEFT JOIN FILES F ON(R.FILE_NO = F.FILE_NO)
+		LEFT JOIN MEMBER M ON(R.MEMBER_NO = M.MEMBER_NO)
+		
+		<where>
+			<if test="searchVo.delyn == null">
+				R.DELYN ='N'
+			</if>
+
+			<if test="searchVo.restaurantName != null and searchVo.restaurantName != ''">
+				AND RESTAURANT_NAME LIKE '%'||#{searchVo.restaurantName}||'%'
+			</if>
+			<if test="searchVo.restaurantAdd1 != null and searchVo.restaurantAdd1 != ''">
+				AND RESTAURANT_ADD1 LIKE '%'||#{searchVo.restaurantAdd1}||'%'
+			</if>
+			<if test="searchVo.restaurantCodeNo==2">
+				AND RESTAURANT_CODE_NO = 2
+			</if>
+			<if test="searchVo.restaurantCodeNo==3">
+				AND RESTAURANT_CODE_NO = 3
+			</if>
+			<if test="searchVo.restaurantCodeNo==4">
+				AND RESTAURANT_CODE_NO = 4
+			</if>
+			<if test="searchVo.restaurantCodeNo==5">
+				AND RESTAURANT_CODE_NO = 5
+			</if>
+			<if test="searchVo.restaurantCodeNo==6">
+				AND RESTAURANT_CODE_NO = 6
+			</if>
+			<if test="searchVo.restaurantCodeNo==7">
+				AND RESTAURANT_CODE_NO = 7
+			</if>
+			<if test="searchVo.restaurantCodeNo==8">
+				AND RESTAURANT_CODE_NO = 8
+			</if>
+			<if test="searchVo.restaurantCodeNo==9">
+				AND RESTAURANT_CODE_NO = 9
+			</if>
+			<if test="searchVo.restaurantCodeNo==10">
+				AND RESTAURANT_CODE_NO = 10
+			</if>
+			<if test="searchVo.restaurantCodeNo==11">
+				AND RESTAURANT_CODE_NO = 11
+			</if>
+			
+			<if test="searchVo.memberNo != 0">
+				AND R.MEMBER_NO = #{searchVo.memberNo}
+			</if>
+			
+		</where>			
+		
+		ORDER BY
+ 		<if test="searchVo.orderScore != null and searchVo.orderScore != '' and searchVo.orderScore == 1">
+			SCORE DESC,
+		</if>
+ 		<if test="searchVo.orderScore == 2">
+			SCORE ,
+		</if> 		
+ 		R.CREATE_DATE DESC	
+		OFFSET (#{pageNo} - 1) * #{recordCountPerPage} ROWS FETCH FIRST #{recordCountPerPage} ROWS ONLY
+	</select>
+
+	<select id="detail" parameterType="restaurantVo" resultType="restaurantVo">
+		SELECT R.*, F.*, M.*, RC.*,
+				<!-- 리뷰 스코어 -->
+				(SELECT NVL(AVG(REVIEW_SCORE),0) FROM REVIEW WHERE RESTAURANT_NO = R.RESTAURANT_NO) AS SCORE,
+				<!-- 리뷰 카운트 -->
+				(SELECT NVL(COUNT(*),0) FROM REVIEW WHERE RESTAURANT_NO = R.RESTAURANT_NO) AS REVIEW_CNT,
+				(SELECT MEMBER_NO FROM PICK WHERE RESTAURANT_NO = #{restaurantNo} AND MEMBER_NO = #{memberNo}) AS PICK
+		FROM RESTAURANT R
+		LEFT JOIN FILES F ON(R.FILE_NO = F.FILE_NO)
+		LEFT JOIN MEMBER M ON(R.MEMBER_NO = M.MEMBER_NO)
+		LEFT JOIN RESTAURANT_CODE RC ON(R.RESTAURANT_CODE_NO = RC.RESTAURANT_CODE_NO)
+		WHERE R.RESTAURANT_NO = #{restaurantNo}
+	</select>
+	
+	<insert id="insert" parameterType="restaurantVo">
+		INSERT INTO RESTAURANT(
+			RESTAURANT_NO, RESTAURANT_CODE_NO, LOCAL_NO, 
+			RESTAURANT_NAME, RESTAURANT_DES, RESTAURANT_ADD1, RESTAURANT_ADD2, RESTAURANT_TEL,
+			RESTAURANT_X, RESTAURANT_Y
+			<if test="fileNo != null and fileNo != ''">
+				, FILE_NO
+			</if>
+			
+			)
+		VALUES (
+			#{restaurantNo}, #{restaurantCodeNo}, #{localNo},
+			#{restaurantName}, #{restaurantDes}, #{restaurantAdd1}, #{restaurantAdd2}, #{restaurantTel},
+			0, 0
+			<if test="fileNo != null and fileNo != ''">
+				, #{fileNo}
+			</if>
+		)
+	</insert>
+
+	<update id="update" parameterType="restaurantVo">
+	    UPDATE RESTAURANT
+			SET RESTAURANT_CODE_NO = #{restaurantCodeNo},
+	        LOCAL_NO = #{localNo},
+	        RESTAURANT_NAME = #{restaurantName},
+	        RESTAURANT_DES = #{restaurantDes},
+	        RESTAURANT_ADD1 = #{restaurantAdd1},
+	        RESTAURANT_ADD2 = #{restaurantAdd2},
+	        RESTAURANT_TEL = #{restaurantTel}
+	        <if test="fileNo != null and fileNo != ''">
+				, FILE_NO = #{fileNo}
+			</if>
+					
+	    WHERE RESTAURANT_NO = #{restaurantNo}
+	</update>
+	
+	<insert id="restaurantFileInsert" parameterType="list">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO RESTAURANT_FILE
+			VALUES(#{item.file_no}, #{item.restaurant_no})
+		</foreach>
+		SELECT 1 FROM DUAL
+	</insert>
+
+	<insert id="restaurantFileDelete" parameterType="int[]">
+		DELETE RESTAURANT_FILE
+		WHERE FILE_NO IN
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</insert>
+
+	<update id="delete" parameterType="restaurantVo">
+		UPDATE RESTAURANT
+		SET DELYN = 'Y'
+		WHERE RESTAURANT_NO = #{restaurantNo}
+	</update>
+
+	<select id="getFileList" parameterType="restaurantVo" resultType="fileVo">
+		SELECT F.*
+		FROM FILES F
+		JOIN RESTAURANT_FILE RF ON (F.FILE_NO = RF.FILE_NO)
+		WHERE RF.RESTAURANT_NO = #{restaurantNo} 
+	</select>
+	
+	
+	<select id="reviewList" resultType="reviewVo" parameterType="hashmap">
+		SELECT 
+            R.REVIEW_NO, R.REVIEW_CONTENT,R.REVIEW_SCORE, R.CREATE_DATE,
+            M.MEMBER_NO, M.MEMBER_NAME,
+            F.FILE_SAVE_NAME,
+            RES.RESTAURANT_NAME,
+            <!-- 팔로우 여부  -->
+            (SELECT FOLLOW_NO FROM FOLLOW F WHERE F.MEMBER_NO = #{memberNo} AND F.MEMBER_FOLLOW_NO = M.MEMBER_NO) as follow_no
+		FROM Review R
+		LEFT JOIN MEMBER_PROFILE M ON (M.MEMBER_NO = R.MEMBER_NO)
+    LEFT JOIN RESTAURANT RES ON (R.RESTAURANT_NO = RES.RESTAURANT_NO)
+		LEFT JOIN FILES F ON (F.FILE_NO = M.FILE_NO)
+		WHERE RES.RESTAURANT_NO = #{restaurantNo}
+		AND R.DELYN = 'N'
+	</select>
+
+  <select id="getPickCount" parameterType="pagenation" resultType="int" >
+      SELECT COUNT(R.RESTAURANT_NO)
+      FROM PICK P , RESTAURANT R
+      WHERE P.RESTAURANT_NO = R.RESTAURANT_NO
+      AND P.MEMBER_NO = #{pageMap.memberNo}
+  </select>
+  
+  	<select id="pickRestaurantList" parameterType="pagenation" resultType="restaurantVo">
+	
+
+		SELECT 
+			R.*,
+			F.*,
+			(SELECT NVL(AVG(REVIEW_SCORE),0) FROM REVIEW WHERE RESTAURANT_NO = R.RESTAURANT_NO) AS SCORE
+		FROM RESTAURANT R
+		LEFT JOIN FILES F ON(R.FILE_NO = F.FILE_NO)
+		LEFT JOIN PICK P ON(P.RESTAURANT_NO = R.RESTAURANT_NO)
+				WHERE P.MEMBER_NO = #{pageMap.memberNo}
+		ORDER BY R.CREATE_DATE DESC
+	
+	</select>
+  
+  
+</mapper>
