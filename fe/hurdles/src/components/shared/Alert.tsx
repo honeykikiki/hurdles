@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import styled from "@emotion/styled";
 import Button from "./Button";
 
@@ -104,7 +105,7 @@ const AlertContainer = styled.div`
   width: calc(100% - 60px);
   max-width: 420px;
   /* min-width: 330px; */
-  border-radius: 20px;
+  border-radius: ${radius.xl};
   padding: 20px;
   box-sizing: border-box;
   position: absolute;

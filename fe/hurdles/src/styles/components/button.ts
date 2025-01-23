@@ -1,3 +1,4 @@
+import { radius } from "@styles/containerSize";
 import { css } from "@emotion/react";
 import { colors } from "../colorPlatte";
 
@@ -20,25 +21,25 @@ export const buttonColorMap = {
     background-color: ${colors.primary};
     color: #fff;
     border: 1px solid ${colors.primary};
-    border-radius: 10px;
+    border-radius: ${radius.md};
   `,
   gray: css`
     background-color: ${colors.gray};
     color: ${colors.textSubColor};
     border: 1px solid ${colors.gray};
-    border-radius: 10px;
+    border-radius: ${radius.md};
   `,
   success: css`
     background-color: ${colors.success};
     color: ${colors.white};
     border: 1px solid ${colors.success};
-    border-radius: 10px;
+    border-radius: ${radius.md};
   `,
   error: css`
     background-color: ${colors.danger};
     color: ${colors.white};
     border: 1px solid ${colors.danger};
-    border-radius: 10px;
+    border-radius: ${radius.md};
   `,
 };
 
@@ -47,25 +48,25 @@ export const buttonWeakMap = {
     background-color: ${colors.white};
     color: ${colors.primary};
     border: 1px solid ${colors.primary};
-    border-radius: 16px;
+    border-radius: ${radius.lg};
   `,
   gray: css`
     background-color: ${colors.white};
     color: ${colors.onlyBlack};
     border: 1px solid ${colors.grayBorder};
-    border-radius: 16px;
+    border-radius: ${radius.lg};
   `,
   success: css`
     background-color: ${colors.white};
     color: ${colors.success};
     border: 1px solid ${colors.success};
-    border-radius: 16px;
+    border-radius: ${radius.lg};
   `,
   error: css`
     background-color: ${colors.white};
     color: ${colors.danger};
     border: 1px solid ${colors.danger};
-    border-radius: 16px;
+    border-radius: ${radius.lg};
   `,
 };
 

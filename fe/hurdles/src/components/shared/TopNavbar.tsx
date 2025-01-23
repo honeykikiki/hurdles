@@ -1,6 +1,7 @@
 import { colors } from "@styles/colorPlatte";
 import { spacing } from "@styles/spacingPalette";
 import styled from "@emotion/styled";
+import { Link } from "react-router-dom";
 import Button from "./Button";
 import Flex from "./Flex";
 import Icons from "./Icons";
@@ -22,7 +23,9 @@ function TopNavbar({ title, bBackButton, backButtonClick, bAlert }: TopNavbar) {
             <Icons.Back />
           </Button>
         ) : (
-          <Icons.Main />
+          <Link to={"/"}>
+            <Icons.Main />
+          </Link>
         )}
 
         <MyTextCenter typography="t5" fontWeight="bold">

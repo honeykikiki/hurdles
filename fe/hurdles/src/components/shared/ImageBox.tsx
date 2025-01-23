@@ -44,7 +44,6 @@ function ImageBox({
 
   const width = bFull ? "100%" : `${container[size].width}`;
   const height = bFull ? "auto" : `${container[size].height}`;
-  console.log(src);
 
   return (
     <Container

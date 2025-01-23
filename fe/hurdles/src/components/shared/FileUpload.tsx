@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import { useRef, useState, useCallback } from "react";
 import styled from "@emotion/styled";
 import Flex from "./Flex";
@@ -93,7 +94,7 @@ const Close = styled.div`
   right: -5px;
   top: -5px;
   background-color: ${colors.black};
-  border-radius: 50%;
+  border-radius: ${radius.half};
   padding: 3px;
   width: 16px;
   height: 16px;

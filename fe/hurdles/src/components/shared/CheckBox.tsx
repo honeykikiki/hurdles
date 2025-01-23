@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import styled from "@emotion/styled";
 import MyText from "./Text";
 
@@ -7,7 +8,7 @@ const Container = styled.div<{ isChecked: boolean }>`
   align-items: center;
   justify-content: space-between;
   border: 1px solid ${colors.inputBorder};
-  border-radius: 10px;
+  border-radius: ${radius.md};
   padding: 16px;
   background-color: ${({ isChecked }) =>
     isChecked ? colors.selectedBg : colors.white};
@@ -22,7 +23,7 @@ const Circle = styled.div<{ isChecked: boolean }>`
     ${({ isChecked }) => (isChecked ? colors.primary : colors.inputBorder)};
   background-color: ${({ isChecked }) =>
     isChecked ? colors.primary : colors.white};
-  border-radius: 50%;
+  border-radius: ${radius.half};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,7 +37,7 @@ const Circle = styled.div<{ isChecked: boolean }>`
     height: 14px;
     background-color: ${({ isChecked }) =>
       isChecked ? colors.onlyWhite : "transparent"};
-    border-radius: 50%;
+    border-radius: ${radius.half};
     transition: background-color 0.3s ease;
   }
 `;

@@ -7,3 +7,13 @@ export const container = {
 };
 
 export type ContainerSize = keyof typeof container;
+
+export const radius = {
+  sm: "8px",
+  md: "10px",
+  lg: "16px",
+  xl: "20px",
+  half: "50%",
+};
+
+export type RadiusSize = keyof typeof radius;

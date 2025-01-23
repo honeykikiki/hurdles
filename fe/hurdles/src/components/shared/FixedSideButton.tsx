@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import styled from "@emotion/styled";
 import Icons from "./Icons";
 
@@ -37,7 +38,7 @@ const PositionContainer = styled.div`
   position: absolute;
   bottom: 92px;
   right: 20px;
-  border-radius: 50%;
+  border-radius: ${radius.half};
   width: 50px;
   height: 50px;
   background-color: ${colors.primary};

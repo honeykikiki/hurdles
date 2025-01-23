@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import { Typography } from "@styles/typography";
 import { HTMLAttributes } from "react";
 import { useBottomSheetContext } from "src/context/BottomSheetContext";
@@ -15,7 +16,7 @@ const SelectContainer = styled.div<{ size: SelectType }>`
   display: inline-flex;
   align-items: center;
   background-color: ${colors.selectedBg};
-  border-radius: 8px;
+  border-radius: ${radius.md};
   width: fit-content;
   cursor: pointer;
   color: #666;

@@ -1,4 +1,5 @@
 import { colors } from "@styles/colorPlatte";
+import { radius } from "@styles/containerSize";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { createPortal } from "react-dom";
@@ -59,7 +60,7 @@ const Container = styled.div`
 `;
 
 const buttonStyle = css`
-  border-radius: 8px;
+  border-radius: ${radius.sm};
   padding: 10px 20px;
 `;
 
