@@ -2,7 +2,6 @@ import axios from "axios";
 
 // export const url = "http://39.119.222.230:8080/";
 export const URL = import.meta.env.VITE_SERVER_URL ?? "";
-console.log(URL);
 
 export const IMAGE_URL = URL + "upload/";
 

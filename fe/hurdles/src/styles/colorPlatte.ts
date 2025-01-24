@@ -29,6 +29,8 @@ export const colorPalette = css`
 
     --only-white: #ffffff;
     --only-black: #000;
+
+    --skeleton-background: #e8e8e8;
   }
 
   /* 다크 모드 색상 설정 */
@@ -81,6 +83,7 @@ export const colors = {
   black: "var(--black)",
   onlyWhite: "var(--only-white)",
   onlyBlack: "var(--only-black)",
+  skeletonBg: "var(--skeleton-background)",
   transparent: "transparent",
 };
 
