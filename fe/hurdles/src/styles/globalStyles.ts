@@ -9,7 +9,7 @@ export default css`
     --dimmed-z-index: 10;
     --bottom-sheet-z-index: 11;
     --alert-z-index: 12;
-    --max-width: 580px;
+    --max-width: 480px;
   }
 
   * {

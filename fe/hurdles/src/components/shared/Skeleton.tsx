@@ -1,10 +1,11 @@
 import { Shimmer } from "@styles/animation/Shimmer";
 import { colors } from "@styles/colorPlatte";
 import { ButtonSize, buttonSizeMap } from "@styles/components/button";
-import { container, ContainerSize, radius } from "@styles/containerSize";
+import { ContainerSize, radius } from "@styles/containerSize";
 import { Typography } from "@styles/typography";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
+import ImageBox from "./ImageBox";
 import MyText from "./Text";
 
 // SkeletonSize;
@@ -14,7 +15,7 @@ import MyText from "./Text";
 // }
 
 const animation = css`
-  animation: ${Shimmer} 1.5s infinite linear;
+  animation: ${Shimmer} 2.2s infinite linear;
 `;
 
 const BaseSkeleton = styled.div<{ bFull?: boolean }>(
@@ -39,10 +40,10 @@ const ShimmerContainer = styled.div`
   position: absolute;
   left: -50%;
   top: 0;
-  width: 50%;
+  width: 40%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.15);
-  filter: blur(5px);
+  background-color: rgba(174, 172, 172, 0.677);
+  filter: blur(15px);
   ${animation}
 `;
 
@@ -51,7 +52,7 @@ function TextSkeleton({ typography }: { typography: Typography }) {
     <BaseSkeleton bFull={false}>
       <ShimmerContainer />
       <MyText typography={typography} color="skeletonBg">
-        sk
+        myText myText
       </MyText>
     </BaseSkeleton>
   );
@@ -59,13 +60,9 @@ function TextSkeleton({ typography }: { typography: Typography }) {
 
 function ImageSkeleton({ containerSize }: { containerSize: ContainerSize }) {
   return (
-    <BaseSkeleton
-      bFull={false}
-      css={css`
-        ${container[containerSize]}
-      `}
-    >
+    <BaseSkeleton bFull={true}>
       <ShimmerContainer />
+      <ImageBox size={containerSize} bFull={true} fallback={<></>} />
     </BaseSkeleton>
   );
 }

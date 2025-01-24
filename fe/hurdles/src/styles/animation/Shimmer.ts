@@ -7,10 +7,10 @@ export const Shimmer = keyframes`
     }
     50% {
       transform: translateX(-60%) skewX(-10deg);
-      opacity: 1;
+      opacity: .75;
     }
     100% {
-      transform: translate(250%) skewX(-20deg);
+      transform: translate(250%) skewX(-10deg);
       opacity: 0;
     }
 `;
