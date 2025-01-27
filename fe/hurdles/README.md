@@ -167,3 +167,15 @@
   VITE_SERVER_URL=http://localhost:8080/
 
 ```
+
+
+- 문제 : 인피니티 스크롤 데이터 받아오기에 어려움이 있다 ㅠㅠ
+- 해결 방법: vite에서는 밑에 형식 처럼 해야한다. (기존 방식과 다르다!)
+``` js
+  // 불러오는 방법
+  export const URL = import.meta.env.VITE_SERVER_URL ?? "";
+
+  // .env 파일 설정
+  VITE_SERVER_URL=http://localhost:8080/
+
+```

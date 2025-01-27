@@ -1,10 +1,10 @@
 import apiClient from "./axios";
 
-interface GetRestaurant {
+interface GetRestaurantList {
   pageParam: number;
 }
 
-export async function getRestaurant({ pageParam }: GetRestaurant) {
+export async function getRestaurantList({ pageParam }: GetRestaurantList) {
   const { data } = await apiClient.get("/restaurant/list", {
     params: {
       pageNo: pageParam,
@@ -17,4 +17,18 @@ export async function getRestaurant({ pageParam }: GetRestaurant) {
     paginationInfo: data.paginationInfo,
     items: data.items || [],
   };
+}
+
+interface GetRestaurant {
+  restaurantNo: number;
+  memberNo?: number;
+}
+export async function getRestaurant({ restaurantNo, memberNo }: GetRestaurant) {
+  const { data } = await apiClient.get(`/restaurant/detail/${restaurantNo}`, {
+    params: {
+      memberNo,
+    },
+  });
+
+  return data;
 }

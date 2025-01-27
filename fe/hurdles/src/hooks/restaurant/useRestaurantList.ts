@@ -1,11 +1,11 @@
-import { getRestaurant } from "src/remote/restaurant";
+import { getRestaurantList } from "src/remote/restaurant";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
 function useRestaurant() {
   return useSuspenseInfiniteQuery({
     queryKey: ["restaurants"],
     queryFn: ({ pageParam }) => {
-      return getRestaurant({ pageParam });
+      return getRestaurantList({ pageParam });
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
