@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.honey.hurdles.mapper.RestaurantMapper">
-    <select id="list">
-        SELECT  * FROM BOOK
+    <select id="list" resultType="list">
+        SELECT *
+        FROM RESTAURANT
+        OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY
     </select>
+
+    <select id="detail" parameterType="kr.or.honey.hurdles.vo.RestaurantVo">
+        SELECT R.RESTAURANT_NO, R.RESTAURANT_CODE_NO, R.LOCAL_NO, R.MEMBER_NO,
+               R.FILE_NO, R.RESTAURANT_NAME, R.RESTAURANT_DES, R.RESTAURANT_ADD1, R.RESTAURANT_ADD2,
+               R.RESTAURANT_TEL, R.DELYN, R.RESTAURANT_X, R.RESTAURANT_Y, R.CREATE_DATE,
+               F.FILE_NO, F.FILE_SAVE_NAME
+        FROM RESTAURANT R
+                 JOIN RESTAURANT_FILE RF ON (R.RESTAURANT_NO = RF.RESTAURANT_NO)
+                 JOIN FILES F ON (F.FILE_NO = RF.FILE_NO)
+        WHERE R.RESTAURANT_NO = #{restaurantNo}
+    </select>
+
+
 </mapper>

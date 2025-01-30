@@ -1,5 +1,8 @@
 package kr.or.honey.hurdles.vo;
 
+import lombok.Data;
+
+@Data
 public class RestaurantVo {
     private int restaurantNo;
     private int restaurantCodeNo;
