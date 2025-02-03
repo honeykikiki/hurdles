@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="">
-
+<mapper namespace="kr.or.honey.hurdles.mapper.MenuMapper">
+    <select id="list" parameterType="int">
+        SELECT MENU_NO,
+               RESTAURANT_NO,
+               MENU_NAME,
+               MENU_PRICE,
+               MENU_DES,
+               M.CREATE_DATE,
+               F.FILE_NO
+        FROM MENU M
+        LEFT JOIN FILES F on M.FILE_NO = F.FILE_NO
+        WHERE RESTAURANT_NO = #{no}
+        AND M.DELYN = 'N'
+    </select>
 </mapper>
