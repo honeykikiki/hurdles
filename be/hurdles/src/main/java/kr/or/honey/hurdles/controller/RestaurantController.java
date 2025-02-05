@@ -38,9 +38,12 @@ public class RestaurantController {
         pagenation.setSearchVo(restaurantVo);
         log.info("pagenation => {}", pagenation);
         List<RestaurantVo> list = restaurantService.list(pagenation);
+        int totalCount = restaurantService.getTotalCount();
+        pagenation.setTotalRecordCount(totalCount);
 
-        resultMap.put("items", list);
+        resultMap.put("paginationInfo", pagenation);
         resultMap.put("filePath", Constants.FILE_SAVE_PATH);
+        resultMap.put("items", list);
         return resultMap;
     }
 

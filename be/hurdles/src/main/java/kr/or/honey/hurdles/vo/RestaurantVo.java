@@ -9,6 +9,7 @@ import java.util.List;
 public class RestaurantVo {
     private int restaurantNo;
     private int restaurantCodeNo;
+    private String restaurantCodeName;
     private int localNo;
     private int memberNo;
     private int fileNo;
@@ -25,4 +26,10 @@ public class RestaurantVo {
     private String fileSaveName; // 파일 이름
 
     private List<MenuVo> menuList; // 파일 이름
+
+    private boolean bPick; // 좋아요 체크 여부
+
+    public void setBPick(int bPick) {
+        this.bPick = bPick == 1;
+    }
 }

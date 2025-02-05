@@ -11,4 +11,6 @@ public interface RestaurantMapper {
     List<RestaurantVo> list(Pagenation<RestaurantVo> searchVo);
 
     RestaurantVo detail(RestaurantVo restaurantVo);
+
+    int getTotalCount();
 }

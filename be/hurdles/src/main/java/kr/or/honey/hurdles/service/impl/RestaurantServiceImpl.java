@@ -25,4 +25,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     public RestaurantVo detail(RestaurantVo restaurantVo) {
         return restaurantMapper.detail(restaurantVo);
     }
+
+    @Override
+    public int getTotalCount() {
+        return restaurantMapper.getTotalCount();
+    }
 }

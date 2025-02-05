@@ -10,4 +10,6 @@ public interface RestaurantService {
     List<RestaurantVo> list(Pagenation<RestaurantVo> restaurantVo);
 
     RestaurantVo detail(RestaurantVo restaurantVo);
+
+    int getTotalCount();
 }

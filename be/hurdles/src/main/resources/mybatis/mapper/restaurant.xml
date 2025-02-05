@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.honey.hurdles.mapper.RestaurantMapper">
+    <select id="getTotalCount">
+        SELECT COUNT(*) FROM RESTAURANT
+        WHERE DELYN = 'N'
+    </select>
+
     <select id="list" resultType="kr.or.honey.hurdles.vo.RestaurantVo" parameterType="kr.or.honey.hurdles.utils.Pagenation">
-        SELECT R.RESTAURANT_NO, RESTAURANT_CODE_NO, LOCAL_NO, MEMBER_NO, R.FILE_NO, RESTAURANT_NAME, RESTAURANT_DES,
+        SELECT R.RESTAURANT_NO, R.RESTAURANT_CODE_NO, LOCAL_NO, R.MEMBER_NO, R.FILE_NO, RESTAURANT_NAME, RESTAURANT_DES,
         RESTAURANT_ADD1, RESTAURANT_ADD2, RESTAURANT_TEL, R.DELYN, RESTAURANT_X, RESTAURANT_Y, R.CREATE_DATE,
-        RF.FILE_NO, RF.RESTAURANT_NO, F.FILE_NO, FILE_SN, FILE_PATH, FILE_ORG_NAME, FILE_SAVE_NAME, FILE_EXT, FILE_SIZE,
-        F.CREATE_DATE, F.DELYN
+        RF.FILE_NO, RF.RESTAURANT_NO, F.FILE_NO, FILE_SN, FILE_SAVE_NAME,
+        F.CREATE_DATE, F.DELYN,
+        RC.RESTAURANT_CODE_NAME,
+        CASE WHEN NVL(P.MEMBER_NO, 0) = 0 THEN false
+             ELSE true
+        END AS B_PICK
         FROM RESTAURANT R
         LEFT JOIN RESTAURANT_FILE RF ON(R.RESTAURANT_NO = RF.RESTAURANT_NO)
+        LEFT JOIN RESTAURANT_CODE RC ON(R.RESTAURANT_CODE_NO = RC.RESTAURANT_CODE_NO)
         LEFT JOIN FILES F ON (RF.FILE_NO = F.FILE_NO)
+        LEFT JOIN PICK P ON (R.RESTAURANT_NO = P.RESTAURANT_NO AND P.MEMBER_NO = #{searchVo.memberNo})
         WHERE 1 = 1
         <if test="searchVo.delyn == null">
              AND R.DELYN = 'N'
@@ -21,13 +32,13 @@
             AND R.RESTAURANT_ADD1 LIKE '%'||#{searchVo.restaurantAdd1}||'%'
         </if>
         <if test="searchVo.restaurantCodeNo != null and searchVo.restaurantCodeNo != 0">
-            AND RESTAURANT_CODE_NO = #{searchVo.restaurantCodeNo}
+            AND R.RESTAURANT_CODE_NO = #{searchVo.restaurantCodeNo}
         </if>
         <if test="searchVo.memberNo != null and searchVo.memberNo != 0">
-            AND MEMBER_NO = #{searchVo.memberNo}
+            AND R.MEMBER_NO = #{searchVo.memberNo}
         </if>
         ORDER BY R.RESTAURANT_NO DESC
-        OFFSET #{pageNo} * 10 ROWS FETCH NEXT #{recordCountPerPage} ROWS ONLY
+        OFFSET (#{pageNo} - 1) * 10 ROWS FETCH NEXT #{recordCountPerPage} ROWS ONLY
     </select>
 
     <select id="detail" parameterType="kr.or.honey.hurdles.vo.RestaurantVo">

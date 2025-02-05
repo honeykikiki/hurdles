@@ -21,7 +21,7 @@ public class Pagenation<T> {
     private int pageNo;
     private int recordCountPerPage = 15;
     private int pageSize = 10;
-    private int totalRecordCount; // 확인필요
+    private int totalRecordCount; // 총 카운트
     private int lastPageNo;
 
     Map<String, String> pageMap = new HashMap<String, String>(); // pagination 구성 할때, page 번호의 url에 ?search=test와 같이 구성하기 위한 파라미터들
