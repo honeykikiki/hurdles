@@ -28,6 +28,8 @@ public class RestaurantVo {
     private List<MenuVo> menuList; // 파일 이름
 
     private boolean bPick; // 좋아요 체크 여부
+    private int pickCount; // 좋아요 카운트
+    private int reviewCount; // 리뷰 카운트
 
     public void setBPick(int bPick) {
         this.bPick = bPick == 1;
