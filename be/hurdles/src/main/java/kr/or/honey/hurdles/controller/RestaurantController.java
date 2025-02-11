@@ -36,11 +36,11 @@ public class RestaurantController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
         pagenation.setSearchVo(restaurantVo);
-        log.info("pagenation => {}", pagenation);
+//        log.info("pagenation => {}", pagenation);
         List<RestaurantVo> list = restaurantService.list(pagenation);
         int totalCount = restaurantService.getTotalCount();
         pagenation.setTotalRecordCount(totalCount);
-
+        log.info("list => {}", list);
         resultMap.put("paginationInfo", pagenation);
         resultMap.put("filePath", Constants.FILE_SAVE_PATH);
         resultMap.put("items", list);

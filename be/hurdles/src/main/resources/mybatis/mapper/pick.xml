@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.honey.hurdles.mapper.PickMapper">
+    <insert id="pick" parameterType="kr.or.honey.hurdles.vo.PickVo">
+        INSERT INTO PICK (MEMBER_NO, RESTAURANT_NO)
+        VALUES (#{memberNo}, #{restaurantNo})
+    </insert>
+
+    <delete id="pickPop">
+        DELETE PICK
+        WHERE RESTAURANT_NO = #{restrauntNo}
+        AND MEMBER_NO = #{memberNo}
+    </delete>
+</mapper>

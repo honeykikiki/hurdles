@@ -31,6 +31,8 @@ public class RestaurantVo {
     private int pickCount; // 좋아요 카운트
     private int reviewCount; // 리뷰 카운트
 
+    private int[] codeList; // 검색용
+
     public void setBPick(int bPick) {
         this.bPick = bPick == 1;
     }

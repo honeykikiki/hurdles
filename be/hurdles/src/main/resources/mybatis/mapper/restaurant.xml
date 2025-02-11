@@ -6,7 +6,7 @@
         WHERE DELYN = 'N'
     </select>
 
-    <select id="list" resultType="kr.or.honey.hurdles.vo.RestaurantVo" parameterType="kr.or.honey.hurdles.utils.Pagenation">
+    <select id="list" resultType="restaurantVo" parameterType="kr.or.honey.hurdles.utils.Pagenation">
         SELECT R.RESTAURANT_NO, R.RESTAURANT_CODE_NO, LOCAL_NO, R.MEMBER_NO, R.FILE_NO, RESTAURANT_NAME, RESTAURANT_DES,
         RESTAURANT_ADD1, RESTAURANT_ADD2, RESTAURANT_TEL, R.DELYN, RESTAURANT_X, RESTAURANT_Y, R.CREATE_DATE,
         RF.FILE_NO, RF.RESTAURANT_NO, F.FILE_NO, FILE_SN, FILE_SAVE_NAME,
@@ -33,8 +33,11 @@
         <if test="searchVo.restaurantAdd1 != null and searchVo.restaurantAdd1 != ''">
             AND R.RESTAURANT_ADD1 LIKE '%'||#{searchVo.restaurantAdd1}||'%'
         </if>
-        <if test="searchVo.restaurantCodeNo != null and searchVo.restaurantCodeNo != 0">
-            AND R.RESTAURANT_CODE_NO = #{searchVo.restaurantCodeNo}
+        <if test="searchVo.codeList.length > 0">
+            AND R.RESTAURANT_CODE_NO IN
+            <foreach collection="searchVo.codeList" item="code" open="(" separator="," close=")">
+                #{code}
+            </foreach>
         </if>
         <if test="searchVo.memberNo != null and searchVo.memberNo != 0">
             AND R.MEMBER_NO = #{searchVo.memberNo}
