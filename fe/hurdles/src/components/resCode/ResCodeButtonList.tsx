@@ -1,18 +1,23 @@
 import Button from "@components/shared/Button";
 import ScrollContainer from "@components/shared/ScrollContainer";
+import Skeleton from "@components/shared/Skeleton";
 import useResCodeList from "@hooks/resCode/useResCodeList";
 import { radius } from "@styles/containerSize";
 import { spacing } from "@styles/spacingPalette";
 import { useCallback, useState } from "react";
 import { css } from "@emotion/react";
 
-function ResCodeButtonList() {
+interface ResCodeButtonList {
+  onNext: (list: number[]) => void;
+}
+
+function ResCodeButtonList({ onNext }: ResCodeButtonList) {
   const [selectCodeList, setSelectCodeList] = useState<number[]>([]);
-  const { data: resCodeList } = useResCodeList();
+  const { data: resCodeList, isLoading } = useResCodeList();
 
   const handleClick = useCallback(
     (resCodeNo: number) => {
-      let newResCodeList = [];
+      let newResCodeList: number[] = [];
 
       if (selectCodeList.includes(resCodeNo)) {
         newResCodeList = selectCodeList.filter((code) => code !== resCodeNo);
@@ -21,8 +26,10 @@ function ResCodeButtonList() {
       }
 
       setSelectCodeList(newResCodeList);
+
+      onNext(newResCodeList);
     },
-    [selectCodeList],
+    [onNext, selectCodeList],
   );
 
   return (
@@ -34,7 +41,6 @@ function ResCodeButtonList() {
     >
       {resCodeList?.map(({ restaurantCodeName, restaurantCodeNo }) => {
         const select = selectCodeList.includes(restaurantCodeNo);
-
         return (
           <Button
             key={restaurantCodeNo}
@@ -50,7 +56,21 @@ function ResCodeButtonList() {
           </Button>
         );
       })}
+
+      {isLoading ? <ResCodeSkeleton /> : null}
     </ScrollContainer>
+  );
+}
+
+function ResCodeSkeleton() {
+  return (
+    <>
+      {Array(8)
+        .fill("")
+        .map((_, idx) => (
+          <Skeleton.Button key={idx} buttonSize="xs" />
+        ))}
+    </>
   );
 }
 

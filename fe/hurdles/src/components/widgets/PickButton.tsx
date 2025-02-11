@@ -4,17 +4,29 @@ import Spacing from "@components/shared/Spacing";
 import MyText from "@components/shared/Text";
 import { MouseEvent, useState } from "react";
 
-function PickButton({ bPick, count }: { bPick: boolean; count: number }) {
+interface PickButtonProps {
+  bPick: boolean;
+  count: number;
+  restaurantNo: number;
+}
+
+function PickButton({ bPick, count, restaurantNo }: PickButtonProps) {
   const [pick, setPick] = useState(bPick);
   const [pickCount, setPickCount] = useState(count);
   // React.MouseEvent<HTMLButtonElement, MouseEvent>
   const handleLikeToggle = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation(); // 부모 이벤트 막기
-    setPick(!pick);
-    setPickCount((prevPickCount) =>
-      pick ? prevPickCount - 1 : prevPickCount + 1,
-    );
+
+    try {
+      // pick 이벤트 만들기
+      setPick(!pick);
+      setPickCount((prevPickCount) =>
+        pick ? prevPickCount - 1 : prevPickCount + 1,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

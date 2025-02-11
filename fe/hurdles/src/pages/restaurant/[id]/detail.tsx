@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-function RestaurantDetailPage22222() {
+function RestaurantDetailPage() {
   const param = useParams();
 
   return (
@@ -11,4 +11,4 @@ function RestaurantDetailPage22222() {
   );
 }
 
-export default RestaurantDetailPage22222;
+export default RestaurantDetailPage;

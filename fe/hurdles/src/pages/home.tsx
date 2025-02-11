@@ -1,3 +1,4 @@
+import ResCodeButtonList from "@components/resCode/ResCodeButtonList";
 import ResCard from "@components/restaurant/Card";
 import Frame from "@components/shared/Frame";
 import Grid from "@components/shared/Grid";
@@ -6,15 +7,16 @@ import Spacing from "@components/shared/Spacing";
 import useRestaurant from "@hooks/restaurant/useRestaurantList";
 import useIntersectionObserver from "@hooks/useIntersectionObserver";
 import { spacing } from "@styles/spacingPalette";
-import { useRef, useEffect, Suspense } from "react";
+import { useRef, useEffect, useState } from "react";
 
 function HomePage() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const pageRef = useIntersectionObserver(ref, { rootMargin: "250px" });
+  const pageRef = useIntersectionObserver(ref, { rootMargin: "50px" });
   const isPageEnd = !!pageRef?.isIntersecting;
+  const [query, setQuery] = useState<number[]>([]);
 
   const { data, fetchNextPage, hasNextPage, isFetching, isLoading } =
-    useRestaurant();
+    useRestaurant(query);
 
   useEffect(() => {
     if (!isLoading && isPageEnd && hasNextPage) {
@@ -26,9 +28,15 @@ function HomePage() {
   const filePath = data?.pages[0]?.filePath ?? "";
 
   return (
-    <Suspense fallback={<div>suspense 테스트</div>}>
-      <Frame title="메인" bBackButton={false}>
-        <Spacing size={spacing.layout} />
+    <Frame title="메인" bBackButton={false}>
+      <Spacing size={spacing.layout} />
+      <ResCodeButtonList
+        onNext={(list) => {
+          setQuery(list);
+        }}
+      />
+      <Spacing size={spacing.layout} />
+      {restaurantList.length > 0 ? (
         <Grid gridTemplateColumns="1fr 1fr" gridGap={spacing.xl}>
           {restaurantList.map((res, idx) => (
             <ResCard
@@ -38,22 +46,21 @@ function HomePage() {
             />
           ))}
         </Grid>
-
-        {/* 스켈레톤 만들기 */}
-        {isFetching ? <ResonantSkeleton /> : null}
-        <div ref={ref} style={{ height: "50px" }}></div>
-      </Frame>
-    </Suspense>
+      ) : null}
+      {/* 스켈레톤 만들기 */}
+      {isFetching ? <ResonantSkeleton /> : null}
+      <div ref={ref}></div>
+    </Frame>
   );
 }
 
 const ResonantSkeleton = () => {
   return (
     <Grid gridTemplateColumns="1fr 1fr" gridGap={spacing.xl}>
-      {Array(6)
+      {Array(8)
         .fill("")
-        .map(() => (
-          <div>
+        .map((_, idx) => (
+          <div key={idx}>
             <Skeleton.Image containerSize="half" />
             <Spacing size="sm" />
             <Skeleton.Text typography="t5" />

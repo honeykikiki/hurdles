@@ -14,7 +14,6 @@ function useIntersectionObserver(
 
   useEffect(() => {
     const node = elementRef?.current;
-    console.log(node);
 
     if (!node || !window.IntersectionObserver) {
       // `ref`가 없거나 IntersectionObserver가 지원되지 않으면 종료

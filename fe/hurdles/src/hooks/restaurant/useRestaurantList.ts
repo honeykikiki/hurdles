@@ -1,11 +1,11 @@
 import { getRestaurantList } from "src/remote/restaurant";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-function useRestaurant() {
-  return useSuspenseInfiniteQuery({
-    queryKey: ["restaurants"],
+function useRestaurant(query: number[]) {
+  return useInfiniteQuery({
+    queryKey: ["restaurants", query],
     queryFn: ({ pageParam }) => {
-      return getRestaurantList({ pageParam });
+      return getRestaurantList({ pageParam, query });
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -14,8 +14,7 @@ function useRestaurant() {
         ? paginationInfo.pageNo + 1
         : undefined;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    // refetchOnWindowFocus: false, // Prevent automatic refetching when window is refocused\
+    staleTime: 1000 * 60 * 1, // Cache for 5 minutes
   });
 }
 

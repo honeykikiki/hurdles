@@ -19,14 +19,14 @@ export interface Restaurant {
 
   // 사장님 이름
   memName?: string;
-
   restaurantCodeName: string; // 카테고리 명
 
   // 삭제할 이미지 id
   removeFileId?: number[];
 
   score?: number; // 레스토랑 평점
-  reviewCnt?: number; // 리뷰 카운트
 
-  pick?: number; // 0인경우 픽이 안되어 있는것임
+  bPick?: boolean;
+  pickCount: number;
+  reviewCount: number;
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 // export const url = "http://39.119.222.230:8080/";
 export const URL = import.meta.env.VITE_SERVER_URL ?? "";
 
-export const IMAGE_URL = URL + "upload/";
+export const IMAGE_URL = URL + "api/images";
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -11,7 +11,6 @@ const apiClient = axios.create({
   timeout: 10000, // 요청 타임아웃 설정
   headers: {
     "Content-Type": "application/json",
-    // "X-AUTH-TOKEN": `${localStorage.getItem("X-AUTH-TOKEN")}`,
   },
   withCredentials: true,
 });
